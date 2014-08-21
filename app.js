@@ -70,6 +70,8 @@ var Messages = EventStore.EventStore.Client.Messages;
 var callbacks = {
 };
 
+var currentOffset = 0;
+var currentMessage = null;
 console.log('Connecting to ' + options.host + ':' + options.port + '...');
 var connection = net.connect(options, function() {
 	connection.on('error', function(err) {
@@ -78,7 +80,39 @@ var connection = net.connect(options, function() {
 	});
 
 	connection.on('data', function(data) {
-		receiveMessage(data);
+		if (currentMessage == null) {
+			// Read the command length
+			var commandLength = data.readUInt32LE(0);
+			if (commandLength < HEADER_LENGTH) {
+				console.error('Invalid command length of ' + commandLength + ' bytes. Needs to be at least big enough for the header')
+				connection.close();
+			}
+
+			// The entire message will include the command length at the start
+			var messageLength = UINT32_LENGTH + commandLength;
+			if (data.length == messageLength) {
+				// A single packet message, no need to copy into another buffer
+				receiveMessage(data);
+			} else if (data.length > messageLength) {
+				console.error("FIXME: Accept multiple messages in the same packet");
+				connection.end();
+			} else {
+				// The first packet of a multi-packet message
+				currentMessage = new Buffer(messageLength);
+				var packetLength = data.copy(currentMessage, currentOffset, 0);
+				currentOffset = packetLength;
+			}
+		} else {
+			// Another packet for a multi-packet message
+			var packetLength = data.copy(currentMessage, currentOffset, 0);
+			currentOffset += packetLength;
+			if (currentOffset >= currentMessage.length) {
+				console.log("Finished receiving");
+				receiveMessage(currentMessage);
+				currentMessage = null;
+				currentOffset = 0;
+			}
+		}
 	});
 
 	
@@ -149,7 +183,7 @@ var connection = net.connect(options, function() {
 
 					callback(event);
 					break;
-					
+
 				default:
 					console.log('TODO: Add support for parsing ' + getCommandName(pkg.command) + ' events');
 					break;
