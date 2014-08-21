@@ -121,7 +121,8 @@ var connection = net.connect(options, function() {
 							reason = "access denied";
 							break;
 					}
-					console.log("Subscription dropped (" + reason + ")")
+					console.log("Subscription dropped (" + reason + ")");
+					break;
 
 				case COMMANDS.StreamEventAppeared:
 					var eventAppeared = Messages.StreamEventAppeared.decode(pkg.data);
@@ -148,6 +149,7 @@ var connection = net.connect(options, function() {
 
 					callback(event);
 					break;
+					
 				default:
 					console.log('TODO: Add support for parsing ' + getCommandName(pkg.command) + ' events');
 					break;
