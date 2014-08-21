@@ -1,0 +1,26 @@
+{
+  "name": "EventStoreClientApi",
+  "version": "0.0.1",
+  "description": "Node.js client library for connecting to Event Store instances",
+  "main": "app.js",
+  "dependencies": {
+    "protobufjs": "~3.4.0",
+    "node-uuid": "~1.4.1",
+    "long": "~2.0.1"
+  },
+  "devDependencies": {
+    "mocha-teamcity-reporter": "0.0.4",
+    "optimist": "~0.6.1",
+    "mocha": "~1.21.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "eventstore",
+    "event",
+    "store"
+  ],
+  "author": "Carey Bishop",
+  "license": "BSD-2-Clause"
+}
