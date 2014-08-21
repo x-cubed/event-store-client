@@ -31,6 +31,13 @@ var COMMANDS = {
     StreamEventAppeared:               0xC2,
     UnsubscribeFromStream:             0xC3,
     SubscriptionDropped:               0xC4,
+
+    // ...
+    BadRequest:                        0xF0,
+    NotHandled:                        0xF1,
+    Authenticate:                      0xF2,
+    Authenticated:                     0xF3,
+    NotAuthenticated:                  0xF4
 }
 
 // TCP Flags
@@ -53,6 +60,7 @@ var options = {
 	host: '127.0.0.1',
 	port: 1113
 };
+var debug = true;
 
 /*************************************************************************************************/
 var builder = ProtoBuf.loadProtoFile('ClientMessageDtos.proto');
@@ -76,28 +84,44 @@ var connection = net.connect(options, function() {
 	
 	console.log('Connected');
 
-	var streamId = 'chat-GeneralChat';
+	var streamId = '$stats-127.0.0.1:2113'; // 'chat-GeneralChat';
 	console.log('Subscribing to ' + streamId + "...")
 	subscribeToStream(streamId, true, function(streamEvent) {
 		console.log(streamEvent);
+	}, {
+		username: "admin",
+		password: "changeit"
 	});
 
 	function sendPing() {
-		sendMessage(COMMANDS.Ping, FLAGS_NONE, null, function(pkg) {
+		sendMessage(COMMANDS.Ping, null, null, function(pkg) {
 			console.log('Received ' + getCommandName(pkg.command) + ' response!');
 		});
 	}
 
-	function subscribeToStream(streamName, resolveLinkTos, callback) {
+	function subscribeToStream(streamName, resolveLinkTos, callback, credentials) {
 		var subscribeRequest = new Messages.SubscribeToStream(streamName, resolveLinkTos);
 		var data = subscribeRequest.encode().toBuffer();
 
-		var correlationId = sendMessage(COMMANDS.SubscribeToStream, FLAGS_NONE, data, function(pkg) {
+		var correlationId = sendMessage(COMMANDS.SubscribeToStream, credentials, data, function(pkg) {
 			switch (pkg.command) {
 				case COMMANDS.SubscriptionConfirmation:
 					var confirmation = Messages.SubscriptionConfirmation.decode(pkg.data);
 					console.log("Subscription confirmed (last commit " + confirmation.last_commit_position + ", last event " + confirmation.last_event_number + ")");
 					break;
+
+				case COMMANDS.SubscriptionDropped:
+					var dropped = Messages.SubscriptionDropped.decode(pkg.data);
+					var reason = dropped.reason;
+					switch (dropped.reason) {
+						case 0:
+							reason = "unsubscribed";
+							break;
+						case 1:
+							reason = "access denied";
+							break;
+					}
+					console.log("Subscription dropped (" + reason + ")")
 
 				case COMMANDS.StreamEventAppeared:
 					var eventAppeared = Messages.StreamEventAppeared.decode(pkg.data);
@@ -154,14 +178,23 @@ var connection = net.connect(options, function() {
 		return command.toString();
 	}
 
-	function sendMessage(command, flags, data, callback) {
+	function sendMessage(command, credentials, data, callback) {
 		var correlationId = createGuid();
 		var key = correlationId.toString('hex');
 		if (callback != null) {
 			callbacks[key] = callback;
 		}
 
-		var commandLength = HEADER_LENGTH;
+		// Handle authentication
+		var authLength = 0;
+		var flags = FLAGS_NONE;
+		if (credentials) {
+			flags = FLAGS_AUTH;
+			// FIXME: Add support for multi-byte characters
+			authLength = 1 + credentials.username.length + 1 + credentials.password.length;
+		}
+
+		var commandLength = HEADER_LENGTH + authLength;
 		if (data != null) {
 			commandLength += data.length;
 		}
@@ -179,18 +212,30 @@ var connection = net.connect(options, function() {
 		// Correlation ID (16 byte GUID)
 		correlationId.copy(buf, CORRELATION_ID_OFFSET, 0, GUID_LENGTH);
 
-		if (data != null) {
-			data.copy(buf, DATA_OFFSET, 0, data.length);
+		// User's credentials
+		if (credentials) {
+			buf.writeUInt8(credentials.username.length, DATA_OFFSET);
+			buf.write(credentials.username, DATA_OFFSET + 1);
+			buf.writeUInt8(credentials.password.length, DATA_OFFSET + 1 + credentials.username.length);
+			buf.write(credentials.password, DATA_OFFSET + 1 + credentials.username.length + 1);
 		}
 
-		//console.log('Outbound: ' + buf.toString('hex') + ' (' + buf.length + ' bytes) ' + getCommandName(command));
+		if (data != null) {
+			data.copy(buf, DATA_OFFSET + authLength, 0, data.length);
+		}
+
+		if (debug) {
+			console.log('Outbound: ' + buf.toString('hex') + ' (' + buf.length + ' bytes) ' + getCommandName(command));
+		}
 		connection.write(buf);
 		return key;
 	}
 
 	function receiveMessage(buf) {
 		var command = buf[COMMAND_OFFSET];
-		//console.log('Inbound:  ' + buf.toString('hex') + ' (' + buf.length + ' bytes) ' + getCommandName(command));
+		if (debug) {
+			console.log('Inbound:  ' + buf.toString('hex') + ' (' + buf.length + ' bytes) ' + getCommandName(command));
+		}
 
 		// Read the packet length
 		var commandLength = buf.readUInt32LE(0);
@@ -214,7 +259,7 @@ var connection = net.connect(options, function() {
 		// Handle the message
 		if (command == COMMANDS.HeartbeatRequest) {
 			// Automatically respond to heartbeat requests
-			sendMessage(COMMANDS.HeartbeatResponse, FLAGS_NONE);
+			sendMessage(COMMANDS.HeartbeatResponse);
 
 		} else if (callbacks.hasOwnProperty(correlationId)) {
 			// Handle the callback that was previously registered when the request was sent
@@ -227,7 +272,12 @@ var connection = net.connect(options, function() {
 				data: data
 			}
 
-			callback(pkg);
+			try {
+				callback(pkg);
+			} catch (x) {
+				console.error("Callback for " + correlationId + " failed, unhooking.\r\n" + x);
+				delete callbacks[correlationId];
+			}
 		} else {
 			console.warn('Received ' + getCommandName(command) + ' message with unknown correlation ID: ' + correlationId);
 		}
