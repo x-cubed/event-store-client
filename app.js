@@ -60,7 +60,7 @@ var options = {
 	host: '127.0.0.1',
 	port: 1113
 };
-var debug = true;
+var debug = false;
 
 /*************************************************************************************************/
 var builder = ProtoBuf.loadProtoFile('ClientMessageDtos.proto');
@@ -107,7 +107,7 @@ var connection = net.connect(options, function() {
 			var packetLength = data.copy(currentMessage, currentOffset, 0);
 			currentOffset += packetLength;
 			if (currentOffset >= currentMessage.length) {
-				console.log("Finished receiving");
+				// Finished receiving the current message
 				receiveMessage(currentMessage);
 				currentMessage = null;
 				currentOffset = 0;
@@ -121,7 +121,12 @@ var connection = net.connect(options, function() {
 	var streamId = '$stats-127.0.0.1:2113'; // 'chat-GeneralChat';
 	console.log('Subscribing to ' + streamId + "...")
 	subscribeToStream(streamId, true, function(streamEvent) {
-		console.log(streamEvent);
+		var cpuPercent = Math.ceil(100 * streamEvent.data["proc-cpu"]);
+		console.log("ES CPU: " + cpuPercent + "%");
+
+		var receivedBytes = streamEvent.data["proc-tcp-receivedBytesTotal"];
+		var sentBytes = streamEvent.data["proc-tcp-sentBytesTotal"];
+		console.log("ES TCP: Received " + receivedBytes + ", Sent " + sentBytes);
 	}, {
 		username: "admin",
 		password: "changeit"
