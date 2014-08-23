@@ -1,45 +1,9 @@
 var net = require('net');
 var uuid = require('node-uuid');
 var Messages = require("./lib/messages");
+var Commands = require("./lib/commands");
 
 /*************************************************************************************************/
-// CONSTANTS
-
-// TCP Commands
-var COMMANDS = {
-	HeartbeatRequest:                  0x01,
-	HeartbeatResponse:                 0x02,
-
-	Ping:                              0x03,
-	Pong:                              0x04,
-
-	// ...
-
-	Read:                              0xB0,
-    ReadEventCompleted:                0xB1,
-    ReadStreamEventsForward:           0xB2,
-    ReadStreamEventsForwardCompleted:  0xB3,
-    ReadStreamEventsBackward:          0xB4,
-    ReadStreamEventsBackwardCompleted: 0xB5,
-    ReadAllEventsForward:              0xB6,
-    ReadAllEventsForwardCompleted:     0xB7,
-    ReadAllEventsBackward:             0xB8,
-    ReadAllEventsBackwardCompleted:    0xB9,
-
-	SubscribeToStream:                 0xC0,
-    SubscriptionConfirmation:          0xC1,
-    StreamEventAppeared:               0xC2,
-    UnsubscribeFromStream:             0xC3,
-    SubscriptionDropped:               0xC4,
-
-    // ...
-    BadRequest:                        0xF0,
-    NotHandled:                        0xF1,
-    Authenticate:                      0xF2,
-    Authenticated:                     0xF3,
-    NotAuthenticated:                  0xF4
-}
-
 // TCP Flags
 var FLAGS_NONE             = 0x00;
 var FLAGS_AUTH             = 0x01;
@@ -122,6 +86,8 @@ var connection = net.connect(options, function() {
 	
 	console.log('Connected');
 
+	sendPing();
+
 	var streamId = '$stats-127.0.0.1:2113'; // 'chat-GeneralChat';
 	console.log('Subscribing to ' + streamId + "...")
 	subscribeToStream(streamId, true, function(streamEvent) {
@@ -135,8 +101,8 @@ var connection = net.connect(options, function() {
 	});
 
 	function sendPing() {
-		sendMessage(COMMANDS.Ping, null, null, function(pkg) {
-			console.log('Received ' + getCommandName(pkg.command) + ' response!');
+		sendMessage(Commands.Ping, null, null, function(pkg) {
+			console.log('Received ' + Commands.getCommandName(pkg.command) + ' response!');
 		});
 	}
 
@@ -144,14 +110,14 @@ var connection = net.connect(options, function() {
 		var subscribeRequest = new Messages.SubscribeToStream(streamName, resolveLinkTos);
 		var data = subscribeRequest.encode().toBuffer();
 
-		var correlationId = sendMessage(COMMANDS.SubscribeToStream, credentials, data, function(pkg) {
+		var correlationId = sendMessage(Commands.SubscribeToStream, credentials, data, function(pkg) {
 			switch (pkg.command) {
-				case COMMANDS.SubscriptionConfirmation:
+				case Commands.SubscriptionConfirmation:
 					var confirmation = Messages.SubscriptionConfirmation.decode(pkg.data);
 					console.log("Subscription confirmed (last commit " + confirmation.last_commit_position + ", last event " + confirmation.last_event_number + ")");
 					break;
 
-				case COMMANDS.SubscriptionDropped:
+				case Commands.SubscriptionDropped:
 					var dropped = Messages.SubscriptionDropped.decode(pkg.data);
 					var reason = dropped.reason;
 					switch (dropped.reason) {
@@ -165,7 +131,7 @@ var connection = net.connect(options, function() {
 					console.log("Subscription dropped (" + reason + ")");
 					break;
 
-				case COMMANDS.StreamEventAppeared:
+				case Commands.StreamEventAppeared:
 					var eventAppeared = Messages.StreamEventAppeared.decode(pkg.data);
 
 					// StreamEventAppeared.ResolvedEvent.EventRecord
@@ -207,19 +173,6 @@ var connection = net.connect(options, function() {
 		return buffer;
 	}
 
-	/***
-	 * Returns a nice name for a TCP Command ID
-	 */
-	function getCommandName(command) {
-		for(var key in COMMANDS) {
-			if (COMMANDS.hasOwnProperty(key)) {
-				if (COMMANDS[key] == command) {
-					return key;
-				}
-			}
-		}
-		return command.toString();
-	}
 
 	function sendMessage(command, credentials, data, callback) {
 		var correlationId = createGuid();
@@ -300,9 +253,9 @@ var connection = net.connect(options, function() {
 		}
 
 		// Handle the message
-		if (command == COMMANDS.HeartbeatRequest) {
+		if (command == Commands.HeartbeatRequest) {
 			// Automatically respond to heartbeat requests
-			sendMessage(COMMANDS.HeartbeatResponse);
+			sendMessage(Commands.HeartbeatResponse);
 
 		} else if (callbacks.hasOwnProperty(correlationId)) {
 			// Handle the callback that was previously registered when the request was sent
