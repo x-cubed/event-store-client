@@ -1,6 +1,6 @@
 var net = require('net');
 var uuid = require('node-uuid');
-var ProtoBuf = require('protobufjs');
+var Messages = require("./lib/messages");
 
 /*************************************************************************************************/
 // CONSTANTS
@@ -63,9 +63,6 @@ var options = {
 var debug = false;
 
 /*************************************************************************************************/
-var builder = ProtoBuf.loadProtoFile('ClientMessageDtos.proto');
-var EventStore = builder.build();
-var Messages = EventStore.EventStore.Client.Messages;
 
 var callbacks = {
 };
@@ -80,37 +77,44 @@ var connection = net.connect(options, function() {
 	});
 
 	connection.on('data', function(data) {
-		if (currentMessage == null) {
-			// Read the command length
-			var commandLength = data.readUInt32LE(0);
-			if (commandLength < HEADER_LENGTH) {
-				console.error('Invalid command length of ' + commandLength + ' bytes. Needs to be at least big enough for the header')
-				connection.close();
-			}
+		while (data != null) {
+			if (currentMessage == null) {
+				// Read the command length
+				var commandLength = data.readUInt32LE(0);
+				if (commandLength < HEADER_LENGTH) {
+					console.error('Invalid command length of ' + commandLength + ' bytes. Needs to be at least big enough for the header')
+					connection.close();
+				}
 
-			// The entire message will include the command length at the start
-			var messageLength = UINT32_LENGTH + commandLength;
-			if (data.length == messageLength) {
-				// A single packet message, no need to copy into another buffer
-				receiveMessage(data);
-			} else if (data.length > messageLength) {
-				console.error("FIXME: Accept multiple messages in the same packet");
-				connection.end();
+				// The entire message will include the command length at the start
+				var messageLength = UINT32_LENGTH + commandLength;
+				if (data.length == messageLength) {
+					// A single packet message, no need to copy into another buffer
+					receiveMessage(data);
+					data = null;
+				} else if (data.length > messageLength) {
+					// Multiple messages in one packet
+					var firstMessage = data.slice(0, messageLength);
+					receiveMessage(firstMessage);
+					data = data.slice(currentLength, data.length - currentLength);
+				} else {
+					// The first packet of a multi-packet message
+					currentMessage = new Buffer(messageLength);
+					var packetLength = data.copy(currentMessage, currentOffset, 0);
+					currentOffset = packetLength;
+					data = null;
+				}
 			} else {
-				// The first packet of a multi-packet message
-				currentMessage = new Buffer(messageLength);
+				// Another packet for a multi-packet message
 				var packetLength = data.copy(currentMessage, currentOffset, 0);
-				currentOffset = packetLength;
-			}
-		} else {
-			// Another packet for a multi-packet message
-			var packetLength = data.copy(currentMessage, currentOffset, 0);
-			currentOffset += packetLength;
-			if (currentOffset >= currentMessage.length) {
-				// Finished receiving the current message
-				receiveMessage(currentMessage);
-				currentMessage = null;
-				currentOffset = 0;
+				currentOffset += packetLength;
+				if (currentOffset >= currentMessage.length) {
+					// Finished receiving the current message
+					receiveMessage(currentMessage);
+					currentMessage = null;
+					currentOffset = 0;
+				}
+				data = null;
 			}
 		}
 	});
@@ -122,11 +126,9 @@ var connection = net.connect(options, function() {
 	console.log('Subscribing to ' + streamId + "...")
 	subscribeToStream(streamId, true, function(streamEvent) {
 		var cpuPercent = Math.ceil(100 * streamEvent.data["proc-cpu"]);
-		console.log("ES CPU: " + cpuPercent + "%");
-
 		var receivedBytes = streamEvent.data["proc-tcp-receivedBytesTotal"];
 		var sentBytes = streamEvent.data["proc-tcp-sentBytesTotal"];
-		console.log("ES TCP: Received " + receivedBytes + ", Sent " + sentBytes);
+		console.log("ES CPU " + cpuPercent + "%, TCP Bytes Received " + receivedBytes + ", TCP Bytes Sent " + sentBytes);
 	}, {
 		username: "admin",
 		password: "changeit"
