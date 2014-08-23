@@ -1,5 +1,7 @@
 var net = require('net');
 var uuid = require('node-uuid');
+var nconf = require('nconf');
+
 var Messages = require("./lib/messages");
 var Commands = require("./lib/commands");
 
@@ -19,12 +21,26 @@ var DATA_OFFSET            = CORRELATION_ID_OFFSET + GUID_LENGTH; // Length + Cm
 
 /*************************************************************************************************/
 // CONFIGURATION
+// First consider commandline arguments and environment variables, respectively.
+nconf.argv().env();
 
-var options = {
-	host: '127.0.0.1',
-	port: 1113
-};
-var debug = false;
+// Then load configuration from a designated file.
+nconf.file({
+	file: 'config.json'
+});
+
+// Provide default values for settings not provided above.
+nconf.defaults({
+    'eventStore': {
+    	'address': "127.0.0.1",
+        'port': 1113,
+        'stream': '$stats-127.0.0.1:2113'
+    },
+    'debug': true
+});
+
+
+var debug = nconf.get('debug');
 
 /*************************************************************************************************/
 
@@ -33,6 +49,11 @@ var callbacks = {
 
 var currentOffset = 0;
 var currentMessage = null;
+
+var options = {
+	host: nconf.get('eventStore:address'),
+	port: nconf.get('eventStore:port'),
+};
 console.log('Connecting to ' + options.host + ':' + options.port + '...');
 var connection = net.connect(options, function() {
 	connection.on('error', function(err) {
@@ -88,7 +109,7 @@ var connection = net.connect(options, function() {
 
 	sendPing();
 
-	var streamId = '$stats-127.0.0.1:2113'; // 'chat-GeneralChat';
+	var streamId = nconf.get('eventStore:stream');
 	console.log('Subscribing to ' + streamId + "...")
 	subscribeToStream(streamId, true, function(streamEvent) {
 		var cpuPercent = Math.ceil(100 * streamEvent.data["proc-cpu"]);
@@ -158,7 +179,7 @@ var connection = net.connect(options, function() {
 					break;
 
 				default:
-					console.log('TODO: Add support for parsing ' + getCommandName(pkg.command) + ' events');
+					console.log('TODO: Add support for parsing ' + Commands.getCommandName(pkg.command) + ' events');
 					break;
 			}
 		});
@@ -221,7 +242,7 @@ var connection = net.connect(options, function() {
 		}
 
 		if (debug) {
-			console.log('Outbound: ' + buf.toString('hex') + ' (' + buf.length + ' bytes) ' + getCommandName(command));
+			console.log('Outbound: ' + buf.toString('hex') + ' (' + buf.length + ' bytes) ' + Commands.getCommandName(command));
 		}
 		connection.write(buf);
 		return key;
@@ -230,7 +251,7 @@ var connection = net.connect(options, function() {
 	function receiveMessage(buf) {
 		var command = buf[COMMAND_OFFSET];
 		if (debug) {
-			console.log('Inbound:  ' + buf.toString('hex') + ' (' + buf.length + ' bytes) ' + getCommandName(command));
+			console.log('Inbound:  ' + buf.toString('hex') + ' (' + buf.length + ' bytes) ' + Commands.getCommandName(command));
 		}
 
 		// Read the packet length
