@@ -1,7 +1,13 @@
 {
-  "name": "EventStoreClientApi",
+  "name": "event-store-client",
   "version": "0.0.1",
-  "description": "Node.js client library for connecting to Event Store instances",
+  "description": "Client library for connecting to Event Store instances over TCP/IP",
+  "author": "Carey Bishop",
+  "license": "BSD-2-Clause",
+  "repository" : {
+    "type" : "git",
+    "url" : "http://github.com/x-cubed/event-store-client.git"
+  },
   "main": "app.js",
   "dependencies": {
     "protobufjs": "~3.4.0",
@@ -21,7 +27,5 @@
     "eventstore",
     "event",
     "store"
-  ],
-  "author": "Carey Bishop",
-  "license": "BSD-2-Clause"
+  ]
 }
