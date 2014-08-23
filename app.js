@@ -34,7 +34,11 @@ nconf.defaults({
     'eventStore': {
     	'address': "127.0.0.1",
         'port': 1113,
-        'stream': '$stats-127.0.0.1:2113'
+        'stream': '$stats-127.0.0.1:2113',
+        'credentials': {
+			'username': "admin",
+			'password': "changeit"
+        }
     },
     'debug': true
 });
@@ -110,16 +114,14 @@ var connection = net.connect(options, function() {
 	sendPing();
 
 	var streamId = nconf.get('eventStore:stream');
+	var credentials = nconf.get('eventStore:credentials');
 	console.log('Subscribing to ' + streamId + "...")
 	subscribeToStream(streamId, true, function(streamEvent) {
 		var cpuPercent = Math.ceil(100 * streamEvent.data["proc-cpu"]);
 		var receivedBytes = streamEvent.data["proc-tcp-receivedBytesTotal"];
 		var sentBytes = streamEvent.data["proc-tcp-sentBytesTotal"];
 		console.log("ES CPU " + cpuPercent + "%, TCP Bytes Received " + receivedBytes + ", TCP Bytes Sent " + sentBytes);
-	}, {
-		username: "admin",
-		password: "changeit"
-	});
+	}, credentials);
 
 	function sendPing() {
 		sendMessage(Commands.Ping, null, null, function(pkg) {
