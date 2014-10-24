@@ -8,7 +8,7 @@
     "type" : "git",
     "url" : "http://github.com/x-cubed/event-store-client.git"
   },
-  "main": "app.js",
+  "main": "index.js",
   "dependencies": {
     "protobufjs": "~3.4.0",
     "node-uuid": "~1.4.1",
