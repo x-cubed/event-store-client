@@ -1,17 +1,13 @@
 var nconf = require('nconf');
 var EventStoreClient = require("./index");
 
+// Sample application to demonstrate how to use the Event Store Client
 /*************************************************************************************************/
 // CONFIGURATION
-// First consider commandline arguments and environment variables, respectively.
 nconf.argv().env();
-
-// Then load configuration from a designated file.
 nconf.file({
 	file: 'config.json'
 });
-
-// Provide default values for settings not provided above.
 nconf.defaults({
     'eventStore': {
     	'address': "127.0.0.1",
@@ -22,11 +18,11 @@ nconf.defaults({
 			'password': "changeit"
         }
     },
-    'debug': false
+    'debug': true
 });
-
 /*************************************************************************************************/
 
+// Connect to the Event Store
 var options = {
 	host: nconf.get('eventStore:address'),
 	port: nconf.get('eventStore:port'),
@@ -36,21 +32,32 @@ console.log('Connecting to ' + options.host + ':' + options.port + '...');
 var connection = new EventStoreClient.Connection(options);
 console.log('Connected');
 
+// Ping it to see that its there
 connection.sendPing(function(pkg) {
     console.log('Received ' + EventStoreClient.Commands.getCommandName(pkg.command) + ' response!');
 });
 
+// Subscribe to receive statistics events
 var streamId = nconf.get('eventStore:stream');
 var credentials = nconf.get('eventStore:credentials');
 console.log('Subscribing to ' + streamId + "...");
-connection.subscribeToStream(streamId, true, function(streamEvent) {
+var correlationId = connection.subscribeToStream(streamId, true, onEventAppeared, onSubscriptionConfirmed, onSubscriptionDropped, credentials);
+
+function onEventAppeared(streamEvent) {
     var cpuPercent = Math.ceil(100 * streamEvent.data["proc-cpu"]);
     var receivedBytes = streamEvent.data["proc-tcp-receivedBytesTotal"];
     var sentBytes = streamEvent.data["proc-tcp-sentBytesTotal"];
     console.log("ES CPU " + cpuPercent + "%, TCP Bytes Received " + receivedBytes + ", TCP Bytes Sent " + sentBytes);
-}, function(confirmation) {
+    connection.unsubscribeFromStream(correlationId, credentials, function() {
+        console.log("Unsubscribed");
+    });
+}
+
+function onSubscriptionConfirmed(confirmation) {
     console.log("Subscription confirmed (last commit " + confirmation.last_commit_position + ", last event " + confirmation.last_event_number + ")");
-}, function(dropped) {
+}
+
+function onSubscriptionDropped(dropped) {
     var reason = dropped.reason;
     switch (dropped.reason) {
         case 0:
@@ -61,5 +68,4 @@ connection.subscribeToStream(streamId, true, function(streamEvent) {
             break;
     }
     console.log("Subscription dropped (" + reason + ")");
-}, credentials);
-
+}
