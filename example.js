@@ -1,14 +1,9 @@
-var nconf = require('nconf');
 var EventStoreClient = require("./index");
 
 // Sample application to demonstrate how to use the Event Store Client
 /*************************************************************************************************/
 // CONFIGURATION
-nconf.argv().env();
-nconf.file({
-	file: 'config.json'
-});
-nconf.defaults({
+var config = {
     'eventStore': {
     	'address': "127.0.0.1",
         'port': 1113,
@@ -18,15 +13,15 @@ nconf.defaults({
 			'password': "changeit"
         }
     },
-    'debug': true
-});
+    'debug': false
+};
 /*************************************************************************************************/
 
 // Connect to the Event Store
 var options = {
-	host: nconf.get('eventStore:address'),
-	port: nconf.get('eventStore:port'),
-    debug: nconf.get('debug')
+	host: config.eventStore.address,
+	port: config.eventStore.port,
+    debug: config.debug
 };
 console.log('Connecting to ' + options.host + ':' + options.port + '...');
 var connection = new EventStoreClient.Connection(options);
@@ -38,8 +33,8 @@ connection.sendPing(function(pkg) {
 });
 
 // Subscribe to receive statistics events
-var streamId = nconf.get('eventStore:stream');
-var credentials = nconf.get('eventStore:credentials');
+var streamId = config.eventStore.stream;
+var credentials = config.eventStore.credentials;
 console.log('Subscribing to ' + streamId + "...");
 var correlationId = connection.subscribeToStream(streamId, true, onEventAppeared, onSubscriptionConfirmed, onSubscriptionDropped, credentials);
 
