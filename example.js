@@ -45,6 +45,7 @@ function onEventAppeared(streamEvent) {
     console.log("ES CPU " + cpuPercent + "%, TCP Bytes Received " + receivedBytes + ", TCP Bytes Sent " + sentBytes);
     connection.unsubscribeFromStream(correlationId, credentials, function() {
         console.log("Unsubscribed");
+        connection.close();
     });
 }
 
