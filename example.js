@@ -35,6 +35,17 @@ connection.sendPing(function(pkg) {
 // Subscribe to receive statistics events
 var streamId = config.eventStore.stream;
 var credentials = config.eventStore.credentials;
+
+console.log('Reading all events forward...');
+var readId = connection.readAllEventsForward(0, 0, 100, true, false, credentials, function(completed) {
+    console.log('Received a completed event: ' + completed.result + ' (error: ' + completed.error + ')');
+    console.log('Events: ' + completed.events.length);
+    for(var i=0; i<completed.events.length; i++) {
+        console.log(completed.events[i]);
+    }
+});
+
+
 console.log('Subscribing to ' + streamId + "...");
 var correlationId = connection.subscribeToStream(streamId, true, onEventAppeared, onSubscriptionConfirmed, onSubscriptionDropped, credentials);
 
