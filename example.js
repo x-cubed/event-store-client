@@ -36,9 +36,24 @@ connection.sendPing(function(pkg) {
 var streamId = config.eventStore.stream;
 var credentials = config.eventStore.credentials;
 
+var destinationId = "TestStream";
+console.log('Writing events to ' + destinationId + '...');
+var newEvent = {
+    event_id: EventStoreClient.Connection.createGuid(),
+    event_type: 'TestEvent',
+    data: {
+        text_property: "value",
+        numeric_property: 42
+    }
+};
+var newEvents = [ newEvent ];
+connection.writeEvents(destinationId, EventStoreClient.ExpectedVersion.Any, false, newEvents, credentials, function(completed) {
+    console.log('Events written result: ' + EventStoreClient.OperationResult.getName(completed.result));
+});
+
 console.log('Reading events forward from ' + streamId + '...');
-var readId = connection.readStreamEventsForward(streamId, 0, 100, true, false, onEventAppeared, credentials, function(completed) {
-    console.log('Received a completed event: ' + completed.result + ' (error: ' + completed.error + ')');
+connection.readStreamEventsForward(streamId, 0, 100, true, false, onEventAppeared, credentials, function(completed) {
+    console.log('Received a completed event: ' + EventStoreClient.OperationResult.getName(completed.result) + ' (error: ' + completed.error + ')');
 });
 
 
