@@ -37,12 +37,8 @@ var streamId = config.eventStore.stream;
 var credentials = config.eventStore.credentials;
 
 console.log('Reading all events forward...');
-var readId = connection.readAllEventsForward(0, 0, 100, true, false, credentials, function(completed) {
+var readId = connection.readAllEventsForward(0, 0, 100, true, false, onEventAppeared, credentials, function(completed) {
     console.log('Received a completed event: ' + completed.result + ' (error: ' + completed.error + ')');
-    console.log('Events: ' + completed.events.length);
-    for(var i=0; i<completed.events.length; i++) {
-        console.log(completed.events[i]);
-    }
 });
 
 
@@ -50,6 +46,10 @@ console.log('Subscribing to ' + streamId + "...");
 var correlationId = connection.subscribeToStream(streamId, true, onEventAppeared, onSubscriptionConfirmed, onSubscriptionDropped, credentials);
 
 function onEventAppeared(streamEvent) {
+    if (streamEvent.stream_id != streamId) {
+        console.log("Unknown event from " + streamEvent.stream_id);
+        return;
+    }
     var cpuPercent = Math.ceil(100 * streamEvent.data["proc-cpu"]);
     var receivedBytes = streamEvent.data["proc-tcp-receivedBytesTotal"];
     var sentBytes = streamEvent.data["proc-tcp-sentBytesTotal"];
