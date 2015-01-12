@@ -36,8 +36,8 @@ connection.sendPing(function(pkg) {
 var streamId = config.eventStore.stream;
 var credentials = config.eventStore.credentials;
 
-console.log('Reading all events forward...');
-var readId = connection.readAllEventsForward(0, 0, 100, true, false, onEventAppeared, credentials, function(completed) {
+console.log('Reading events forward from ' + streamId + '...');
+var readId = connection.readStreamEventsForward(streamId, 0, 100, true, false, onEventAppeared, credentials, function(completed) {
     console.log('Received a completed event: ' + completed.result + ' (error: ' + completed.error + ')');
 });
 
