@@ -65,7 +65,13 @@ connection.readStreamEventsForward(streamId, 0, 100, true, false, onEventAppeare
 
 
 console.log('Subscribing to ' + streamId + "...");
-var correlationId = connection.subscribeToStream(streamId, true, onEventAppeared, onSubscriptionConfirmed, onSubscriptionDropped, credentials);
+var correlationId = connection.subscribeToStream(streamId, true, function(streamEvent) {
+    onEventAppeared(streamEvent);
+    connection.unsubscribeFromStream(correlationId, credentials, function() {
+        console.log("Unsubscribed");
+        closeIfDone();
+    });
+}, onSubscriptionConfirmed, onSubscriptionDropped, credentials);
 
 function onEventAppeared(streamEvent) {
     if (streamEvent.stream_id != streamId) {
@@ -76,10 +82,6 @@ function onEventAppeared(streamEvent) {
     var receivedBytes = streamEvent.data["proc-tcp-receivedBytesTotal"];
     var sentBytes = streamEvent.data["proc-tcp-sentBytesTotal"];
     console.log("ES CPU " + cpuPercent + "%, TCP Bytes Received " + receivedBytes + ", TCP Bytes Sent " + sentBytes);
-    connection.unsubscribeFromStream(correlationId, credentials, function() {
-        console.log("Unsubscribed");
-        closeIfDone();
-    });
 }
 
 function closeIfDone() {
