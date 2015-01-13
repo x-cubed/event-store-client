@@ -36,6 +36,9 @@ connection.sendPing(function(pkg) {
 var streamId = config.eventStore.stream;
 var credentials = config.eventStore.credentials;
 
+var written = false;
+var read = false;
+
 var destinationId = "TestStream";
 console.log('Writing events to ' + destinationId + '...');
 var newEvent = {
@@ -49,11 +52,15 @@ var newEvent = {
 var newEvents = [ newEvent ];
 connection.writeEvents(destinationId, EventStoreClient.ExpectedVersion.Any, false, newEvents, credentials, function(completed) {
     console.log('Events written result: ' + EventStoreClient.OperationResult.getName(completed.result));
+    written = true;
+    closeIfDone();
 });
 
 console.log('Reading events forward from ' + streamId + '...');
 connection.readStreamEventsForward(streamId, 0, 100, true, false, onEventAppeared, credentials, function(completed) {
     console.log('Received a completed event: ' + EventStoreClient.OperationResult.getName(completed.result) + ' (error: ' + completed.error + ')');
+    read = true;
+    closeIfDone();
 });
 
 
@@ -71,8 +78,15 @@ function onEventAppeared(streamEvent) {
     console.log("ES CPU " + cpuPercent + "%, TCP Bytes Received " + receivedBytes + ", TCP Bytes Sent " + sentBytes);
     connection.unsubscribeFromStream(correlationId, credentials, function() {
         console.log("Unsubscribed");
-        connection.close();
+        closeIfDone();
     });
+}
+
+function closeIfDone() {
+    if (written && read) {
+        console.log("All done!");
+        connection.close();
+    }
 }
 
 function onSubscriptionConfirmed(confirmation) {
