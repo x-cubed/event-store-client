@@ -38,6 +38,7 @@ var credentials = config.eventStore.credentials;
 
 var written = false;
 var read = false;
+var readMissing = false;
 
 var destinationId = "TestStream";
 console.log('Writing events to ' + destinationId + '...');
@@ -56,9 +57,17 @@ connection.writeEvents(destinationId, EventStoreClient.ExpectedVersion.Any, fals
     closeIfDone();
 });
 
+var nonExistentStreamId = "NoSuchStream";
+console.log('Reading events forward from ' + nonExistentStreamId + '...');
+connection.readStreamEventsForward(nonExistentStreamId, 0, 100, true, false, onEventAppeared, credentials, function(completed) {
+    console.log('Received a completed event: ' + EventStoreClient.ReadStreamResult.getName(completed.result) + ' (error: ' + completed.error + ')');
+    readMissing = true;
+    closeIfDone();
+});
+
 console.log('Reading events forward from ' + streamId + '...');
 connection.readStreamEventsForward(streamId, 0, 100, true, false, onEventAppeared, credentials, function(completed) {
-    console.log('Received a completed event: ' + EventStoreClient.OperationResult.getName(completed.result) + ' (error: ' + completed.error + ')');
+    console.log('Received a completed event: ' + EventStoreClient.ReadStreamResult.getName(completed.result) + ' (error: ' + completed.error + ')');
     read = true;
     closeIfDone();
 });
@@ -85,7 +94,7 @@ function onEventAppeared(streamEvent) {
 }
 
 function closeIfDone() {
-    if (written && read) {
+    if (written && read && readMissing) {
         console.log("All done!");
         connection.close();
     }
