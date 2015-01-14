@@ -1,12 +1,12 @@
-var Connection          = require("./lib/connection");
-var Commands            = require("./lib/commands");
-var ExpectedVersion     = require("./lib/expectedVersion");
-var Messages            = require("./lib/messages");
-var OperationResult     = require("./lib/operationResult");
-var ReadAllResult       = require("./lib/readAllResult");
-var ReadStreamResult    = require("./lib/readStreamResult");
+var Connection          = require("./lib/connection"),
+    Commands            = require("./lib/commands"),
+    ExpectedVersion     = require("./lib/expectedVersion"),
+    Messages            = require("./lib/messages"),
+    OperationResult     = require("./lib/operationResult"),
+    ReadAllResult       = require("./lib/readAllResult"),
+    ReadStreamResult    = require("./lib/readStreamResult"),
+    EventStoreClient    = {};
 
-var EventStoreClient = {};
 EventStoreClient.Connection         = Connection;
 EventStoreClient.Commands           = Commands;
 EventStoreClient.ExpectedVersion    = ExpectedVersion;
