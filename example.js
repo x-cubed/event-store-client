@@ -43,11 +43,11 @@ var readMissing = false;
 var destinationId = "TestStream";
 console.log('Writing events to ' + destinationId + '...');
 var newEvent = {
-    event_id: EventStoreClient.Connection.createGuid(),
-    event_type: 'TestEvent',
+    eventId: EventStoreClient.Connection.createGuid(),
+    eventType: 'TestEvent',
     data: {
-        text_property: "value",
-        numeric_property: 42
+        textProperty: "value",
+        numericProperty: 42
     }
 };
 var newEvents = [ newEvent ];
@@ -83,8 +83,8 @@ var correlationId = connection.subscribeToStream(streamId, true, function(stream
 }, onSubscriptionConfirmed, onSubscriptionDropped, credentials);
 
 function onEventAppeared(streamEvent) {
-    if (streamEvent.stream_id != streamId) {
-        console.log("Unknown event from " + streamEvent.stream_id);
+    if (streamEvent.streamId != streamId) {
+        console.log("Unknown event from " + streamEvent.streamId);
         return;
     }
     var cpuPercent = Math.ceil(100 * streamEvent.data["proc-cpu"]);
@@ -101,7 +101,7 @@ function closeIfDone() {
 }
 
 function onSubscriptionConfirmed(confirmation) {
-    console.log("Subscription confirmed (last commit " + confirmation.last_commit_position + ", last event " + confirmation.last_event_number + ")");
+    console.log("Subscription confirmed (last commit " + confirmation.lastCommitPosition + ", last event " + confirmation.lastEventNumber + ")");
 }
 
 function onSubscriptionDropped(dropped) {
