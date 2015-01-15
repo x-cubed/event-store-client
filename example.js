@@ -92,7 +92,7 @@ function onEventAppeared(streamEvent) {
     var sentBytes = streamEvent.data["proc-tcp-sentBytesTotal"];
     console.log(streamEvent.eventNumber + " " + streamEvent.eventId + " - " +
         "ES CPU " + cpuPercent + "%, " +
-        "TCP Bytes Received " + receivedBytes + "," +
+        "TCP Bytes Received " + receivedBytes + ", " +
         "TCP Bytes Sent " + sentBytes + " - " +
         streamEvent.created
     );
