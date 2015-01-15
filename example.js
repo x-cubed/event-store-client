@@ -90,7 +90,12 @@ function onEventAppeared(streamEvent) {
     var cpuPercent = Math.ceil(100 * streamEvent.data["proc-cpu"]);
     var receivedBytes = streamEvent.data["proc-tcp-receivedBytesTotal"];
     var sentBytes = streamEvent.data["proc-tcp-sentBytesTotal"];
-    console.log(streamEvent.eventId + " - ES CPU " + cpuPercent + "%, TCP Bytes Received " + receivedBytes + ", TCP Bytes Sent " + sentBytes + " - " + streamEvent.created);
+    console.log(streamEvent.eventNumber + " " + streamEvent.eventId + " - " +
+        "ES CPU " + cpuPercent + "%, " +
+        "TCP Bytes Received " + receivedBytes + "," +
+        "TCP Bytes Sent " + sentBytes + " - " +
+        streamEvent.created
+    );
 }
 
 function closeIfDone() {
