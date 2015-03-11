@@ -99,7 +99,34 @@ describe('Connection', function() {
     });
 
     describe('Writing to a stream', function() {
-        it("should be able to write 1 event to the end of the stream", function(done) {
+        it("should be able to write 1 event with a binary GUID to the end of the stream", function(done) {
+            var options = {
+                host: "eventstore",
+                onError: done
+            };
+
+            var streamId = "event-store-client-test";
+            var expectedVersion = EventStoreClient.ExpectedVersion.Any;
+            var requireMaster = false;
+            var events = [{
+                eventId: EventStoreClient.Connection.createGuid(),
+                eventType: "TestEvent",
+                data: {
+                    testRanAt: new Date().toISOString()
+                }
+            }];
+
+            var connection = new EventStoreClient.Connection(options);
+            connection.writeEvents(streamId, expectedVersion, requireMaster, events, credentials, function (completed) {
+                assert.equal(completed.result, EventStoreClient.OperationResult.Success,
+                    "Expected a result code of Success, not " + EventStoreClient.OperationResult.getName(completed.result) + ": " + completed.message
+                );
+
+                connection.close();
+                done();
+            });
+        });
+        it("should be able to write 1 event with a hex GUID to the end of the stream", function(done) {
             var options = {
                 host: "eventstore",
                 onError: done
