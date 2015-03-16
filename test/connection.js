@@ -3,6 +3,8 @@
  * You can test against a copy of Event Store on localhost by putting "127.0.0.1 eventstore" in your HOSTS file.
   */
 var assert = require("assert");
+var uuid   = require('node-uuid');
+
 var EventStoreClient = require("../index.js");
 
 var credentials = {
@@ -137,6 +139,34 @@ describe('Connection', function() {
             var requireMaster = false;
             var events = [{
                 eventId: EventStoreClient.Connection.createGuid().toString('hex'),
+                eventType: "TestEvent",
+                data: {
+                    testRanAt: new Date().toISOString()
+                }
+            }];
+
+            var connection = new EventStoreClient.Connection(options);
+            connection.writeEvents(streamId, expectedVersion, requireMaster, events, credentials, function (completed) {
+                assert.equal(completed.result, EventStoreClient.OperationResult.Success,
+                    "Expected a result code of Success, not " + EventStoreClient.OperationResult.getName(completed.result) + ": " + completed.message
+                );
+
+                connection.close();
+                done();
+            });
+        });
+
+        it("should be able to write 1 event with a braced hex GUID to the end of the stream", function(done) {
+            var options = {
+                host: "eventstore",
+                onError: done
+            };
+
+            var streamId = "event-store-client-test";
+            var expectedVersion = EventStoreClient.ExpectedVersion.Any;
+            var requireMaster = false;
+            var events = [{
+                eventId: uuid.unparse(EventStoreClient.Connection.createGuid()),
                 eventType: "TestEvent",
                 data: {
                     testRanAt: new Date().toISOString()
