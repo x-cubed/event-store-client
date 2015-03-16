@@ -1,6 +1,6 @@
 {
   "name": "event-store-client",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Client library for connecting to Event Store instances over TCP/IP",
   "author": "Carey Bishop",
   "license": "BSD-2-Clause",
