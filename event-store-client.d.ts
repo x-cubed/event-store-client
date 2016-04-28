@@ -66,6 +66,7 @@ declare module "event-store-client" {
 		streamId: string;
 		eventNumber: number;
 		created: Date;
+		link: StoredEvent;
 	}
 
 	export interface IOperationCompleted {
