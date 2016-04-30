@@ -110,8 +110,9 @@ Represents an event either before or after it has been stored.
 Represents an event as it exists on the Event Store server. Inherits from Event and adds the following properties:
 
 * streamId - The name of the Event Store stream that this event was stored in (string)
-* number - The sequence number for this event within the stream (number)
+* eventNumber - The sequence number for this event within the stream (number)
 * created - The date that this event was stored in the Event Store (date)
+* link - If event was read from a stream using the resolveLinkTos flag, will contain the original link data (from before the event was resolved.) (StoredEvent)
 
 ## ICredentials interface
 An object containing credentials for access to secured resources.
