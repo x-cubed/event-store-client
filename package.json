@@ -10,14 +10,14 @@
   },
   "main": "index.js",
   "dependencies": {
-    "protobufjs": "~3.4.0",
+    "protobufjs": "~5.0.1",
     "node-uuid": "~1.4.1",
-    "long": "~2.0.1"
+    "long": "~3.1.0"
   },
   "devDependencies": {
-    "mocha-teamcity-reporter": "0.0.4",
+    "mocha-teamcity-reporter": "~1.0.0",
     "optimist": "~0.6.1",
-    "mocha": "~1.21.4"
+    "mocha": "~2.4.5"
   },
   "scripts": {
     "test": "mocha",
