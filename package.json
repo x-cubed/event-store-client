@@ -12,7 +12,8 @@
   "dependencies": {
     "protobufjs": "~3.4.0",
     "node-uuid": "~1.4.1",
-    "long": "~2.0.1"
+    "long": "~2.0.1",
+    "argument-validator": "^0.1.0"
   },
   "devDependencies": {
     "mocha-teamcity-reporter": "0.0.4",
