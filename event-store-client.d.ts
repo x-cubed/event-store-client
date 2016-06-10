@@ -164,6 +164,20 @@ declare module "event-store-client" {
 		 */
 		subscribeToStream(streamId: string, resolveLinkTos: boolean, onEventAppeared: (event: StoredEvent) => void, onConfirmed: (confirmation: ISubscriptionConfirmation) => void, onDropped: (dropped: ISubscriptionDropped) => void, credentials: ICredentials): Buffer;
 
+        /***
+         * Initiate catch-up subscription for one stream.
+         * 
+         * @param streamId The stream ID (only if subscribing to a single stream)
+         * @param fromEventNumber Which event number to start after (if null, then from the beginning of the stream.)
+         * @param credentials User credentials for the operations.
+         * @param onEventAppeared Callback for each event received
+         * @param onLiveProcessingStarted Callback when read history phase finishes.
+         * @param onDropped Callback when subscription drops or is dropped.
+         * @param settings Settings for this subscription.
+         * @return The catch-up subscription instance.
+         */
+        subscribeToStreamFrom(streamId: string, fromEventNumber: number, credentials: ICredentials, onEventAppeared: (event: StoredEvent) => void, onLiveProcessingStarted: () => void, onDropped: (EventStoreCatchUpSubscription, string, Error) => void, settings: CatchUpSubscriptionSettings): EventStoreStreamCatchUpSubscription;
+
 		/***
 		 * Reads events from across all streams, in order from newest to oldest
 		 * @param commitPosition The commit position to start from
@@ -234,5 +248,93 @@ declare module "event-store-client" {
 		 * @param callback Invoked once the operation has been completed. Check the result to confirm it was successful.
 		 */
 		writeEvents(streamId: string, expectedVersion: number, requireMaster: boolean, events: Event[], credentials: ICredentials, callback: (completed: IWriteEventsCompleted) => void): void;
-	}
+    }
+
+    /***
+	 * Configuration settings to pass when instantiating a catch-up subscription.
+	 */
+    export class CatchUpSubscriptionSettings {
+
+        /***
+		 * Creates a new settings instance.
+		 * @param maxLiveQueueSize The max amount to buffer when processing from live subscription. 
+         * @param readBatchSize The number of events to read per batch when reading history
+         * @param debug True iff in debug mode
+         * @param resolveLinkTos Whether or not to resolve link events 
+		 */
+        constructor(maxLiveQueueSize: number, readBatchSize: number, debug: boolean, resolveLinkTos: boolean);
+
+        /***
+	     * The max amount to buffer when processing from live subscription.
+	     */
+        maxLiveQueueSize: number;
+
+        /***
+	     * The number of events to read per batch when reading history
+	     */
+        readBatchSize: number;
+
+        /***
+	     * True iff in debug mode
+	     */
+        debug: boolean;
+
+        /***
+	     * Whether or not to resolve link events 
+	     */
+        resolveLinkTos: boolean;
+    }
+
+    /**
+     * Abstract base class representing catch-up subscriptions.
+     */
+    export class EventStoreCatchUpSubscription {
+
+        /***
+		 * Creates a new EventStoreCatchUpSubscription instance.
+		 * @param connection The connection to Event Store
+         * @param streamId The stream name (only if subscribing to a single stream)
+         * @param userCredentials User credentials for the operations.
+         * @param eventAppeared Callback for each event received
+         * @param liveProcessingStarted Callback when read history phase finishes.
+         * @param subscriptionDropped Callback when subscription drops or is dropped.
+         * @param settings Settings for this subscription.
+		 */
+        constructor(connection: Connection, streamId: string, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription, string, Error) => void, settings: CatchUpSubscriptionSettings);
+
+        /***
+         * Provides the correlation ID of the Event Store subscription underlying the catch-up subscription. 
+         * @returns Correlation ID of the Event Store subscription
+         */
+        getCorrelationId(): string;
+
+        /***
+         * Attempts to start the subscription.
+         */
+        start(): void;
+
+        /***
+         * Attempts to stop the subscription.
+         */
+        stop(): void;
+    }
+
+    /**
+     * Catch-up subscription for one stream.
+     */
+    export class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription {
+
+        /***
+		 * Creates a new EventStoreStreamCatchUpSubscription instance.
+		 * @param connection The connection to Event Store
+         * @param streamId The stream name (only if subscribing to a single stream)
+         * @param fromEventNumberExclusive Which event number to start after (if null, then from the beginning of the stream.)
+         * @param userCredentials User credentials for the operations.
+         * @param eventAppeared Callback for each event received
+         * @param liveProcessingStarted Callback when read history phase finishes.
+         * @param subscriptionDropped Callback when subscription drops or is dropped.
+         * @param settings Settings for this subscription.
+		 */
+        constructor(connection: Connection, streamId: string, fromEventNumberExclusive: number, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription, string, Error) => void, settings: CatchUpSubscriptionSettings);
+    }
 }
