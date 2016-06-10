@@ -7,6 +7,7 @@ var uuid   = require('node-uuid');
 
 var EventStoreClient = require("../index.js");
 
+var defaultHostName = "eventstore";
 var credentials = {
     username: "admin",
     password: "changeit"
@@ -16,7 +17,7 @@ describe('Connection', function() {
     describe('Establishing a connection', function() {
         it('should connect successfully to eventstore', function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
             var connection = new EventStoreClient.Connection(options);
@@ -44,7 +45,7 @@ describe('Connection', function() {
     describe('Reading from a stream', function() {
         it("should read 10 events from the stats stream backwards", function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
 
@@ -72,7 +73,7 @@ describe('Connection', function() {
         });
         it("should read 10 events from the stats stream forwards", function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
 
@@ -103,7 +104,7 @@ describe('Connection', function() {
     describe('Writing to a stream', function() {
         it("should be able to write 1 event with a binary GUID to the end of the stream", function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
 
@@ -130,7 +131,7 @@ describe('Connection', function() {
         });
         it("should be able to write 1 event with a hex GUID to the end of the stream", function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
 
@@ -158,7 +159,7 @@ describe('Connection', function() {
 
         it("should be able to write 1 event with a braced hex GUID to the end of the stream", function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
 
