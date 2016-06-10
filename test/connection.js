@@ -1,17 +1,10 @@
-/***
- * To run these tests, install Event Store on a machine, and point the alias eventstore to it, by defining it in your HOSTS file or DNS.
- * You can test against a copy of Event Store on localhost by putting "127.0.0.1 eventstore" in your HOSTS file.
-  */
 var assert = require("assert");
 var uuid   = require('node-uuid');
 
 var EventStoreClient = require("../index.js");
-
-var defaultHostName = "eventstore";
-var credentials = {
-    username: "admin",
-    password: "changeit"
-};
+var common = require("./common");
+var defaultHostName = common.defaultHostName;
+var credentials = common.credentials;
 
 describe('Connection', function() {
     describe('Establishing a connection', function() {
