@@ -5,10 +5,26 @@
 
 (function(dbconn) {
 
+    var EventStoreClient = require("../../index.js");
+
     dbconn.defaultHostName = "eventstore";
     dbconn.credentials = {
         username: "admin",
         password: "changeit"
+    };
+
+    dbconn.open = function (onFail, onSuccess, hostName, credentials) {
+        hostName = hostName || dbconn.defaultHostName;
+        credentials = credentials || dbconn.credentials;
+        var connectionError = null;
+
+        var options = {
+            host: hostName,
+            onError: onFail
+        };
+
+        var connection = new EventStoreClient.Connection(options);
+        if (connection) onSuccess(connection);
     };
 
 })(module.exports);
