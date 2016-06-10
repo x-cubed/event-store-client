@@ -3,10 +3,10 @@
  * You can test against a copy of Event Store on localhost by putting "127.0.0.1 eventstore" in your HOSTS file.
   */
 
-(function(common) {
+(function(dbconn) {
 
-    common.defaultHostName = "eventstore";
-    common.credentials = {
+    dbconn.defaultHostName = "eventstore";
+    dbconn.credentials = {
         username: "admin",
         password: "changeit"
     };

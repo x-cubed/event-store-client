@@ -2,9 +2,9 @@ var assert = require("assert");
 var uuid   = require('node-uuid');
 
 var EventStoreClient = require("../index.js");
-var common = require("./common");
-var defaultHostName = common.defaultHostName;
-var credentials = common.credentials;
+var dbconn = require("./common/dbconn");
+var defaultHostName = dbconn.defaultHostName;
+var credentials = dbconn.credentials;
 
 describe('Connection', function() {
     describe('Establishing a connection', function() {
