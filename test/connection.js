@@ -1,22 +1,16 @@
-/***
- * To run these tests, install Event Store on a machine, and point the alias eventstore to it, by defining it in your HOSTS file or DNS.
- * You can test against a copy of Event Store on localhost by putting "127.0.0.1 eventstore" in your HOSTS file.
-  */
 var assert = require("assert");
 var uuid   = require('node-uuid');
 
 var EventStoreClient = require("../index.js");
-
-var credentials = {
-    username: "admin",
-    password: "changeit"
-};
+var dbconn = require("./common/dbconn");
+var defaultHostName = dbconn.defaultHostName;
+var credentials = dbconn.credentials;
 
 describe('Connection', function() {
     describe('Establishing a connection', function() {
         it('should connect successfully to eventstore', function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
             var connection = new EventStoreClient.Connection(options);
@@ -44,7 +38,7 @@ describe('Connection', function() {
     describe('Reading from a stream', function() {
         it("should read 10 events from the stats stream backwards", function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
 
@@ -72,7 +66,7 @@ describe('Connection', function() {
         });
         it("should read 10 events from the stats stream forwards", function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
 
@@ -103,7 +97,7 @@ describe('Connection', function() {
     describe('Writing to a stream', function() {
         it("should be able to write 1 event with a binary GUID to the end of the stream", function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
 
@@ -130,7 +124,7 @@ describe('Connection', function() {
         });
         it("should be able to write 1 event with a hex GUID to the end of the stream", function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
 
@@ -158,7 +152,7 @@ describe('Connection', function() {
 
         it("should be able to write 1 event with a braced hex GUID to the end of the stream", function(done) {
             var options = {
-                host: "eventstore",
+                host: defaultHostName,
                 onError: done
             };
 

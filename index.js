@@ -1,4 +1,5 @@
-var Connection          = require("./lib/connection"),
+var CatchUpSubscription = require("./lib/CatchUpSubscription"),
+    Connection = require("./lib/connection"),
     Commands            = require("./lib/commands"),
     ExpectedVersion     = require("./lib/expectedVersion"),
     Messages            = require("./lib/messages"),
@@ -7,6 +8,7 @@ var Connection          = require("./lib/connection"),
     ReadStreamResult    = require("./lib/readStreamResult"),
     EventStoreClient    = {};
 
+EventStoreClient.CatchUpSubscription = CatchUpSubscription;
 EventStoreClient.Connection         = Connection;
 EventStoreClient.Commands           = Commands;
 EventStoreClient.ExpectedVersion    = ExpectedVersion;

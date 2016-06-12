@@ -57,6 +57,19 @@ Subscribes to a stream to receive notifications as soon as an event is written t
 
 Returns a Buffer containing a GUID that identifies the subscription, for use with unsubscribeStream().
 
+### Connection.subscribeToStreamFrom()
+Executes a catch-up subscription on the given stream, reading events from a given event number, and continuing with a live subscription when all historical events have been read.
+
+* streamId - The name of the stream in the Event Store (string)
+* fromEventNumber - Which event number to start after (if null, then from the beginning of the stream.)
+* credentials - The user name and password needed for permission to subscribe to the stream.
+* onEventAppeared - Callback for each event received (historical or live)
+* onLiveProcessingStarted - Callback when historical events have been read and live events are about to be read.
+* onDropped - Callback when subscription drops or is dropped.
+* settings - Settings for the catch-up subscription.
+
+Returns an instance representing the catch-up subscription (EventStoreStreamCatchUpSubscription).
+
 ### Connection.readAllEventsBackward() / Connection.readAllEventsForward()
 Reads events from across all streams, in order (backward = newest first, forward = oldest first).
 
@@ -130,3 +143,23 @@ Passed to the onConfirmed callback used by subscribeToStream() when a subscripti
 Passed to the onDropped callback used by subscribeToStream() when a subscription terminates, or cannot be established.
 
 * reason - The reason why the subscription was dropped (enumeration, 0 = Unsubscribed, 1 = Access Denied)
+
+## CatchUpSubscriptionSettings class
+A property bag of settings passed when creating a new catch-up subscription.
+
+* maxLiveQueueSize - The maximum amount to buffer when processing from the live subscription.
+* readBatchSize - The number of events to read per batch when reading historical events.
+* debug - True if in debug mode.
+* resolveLinkTos - Whether or not to resolve link events.
+
+## EventStoreStreamCatchUpSubscription class
+Represents a catch-up subscription to a single stream. 
+
+### EventStoreStreamCatchUpSubscription.start()
+Initiate start of the catch-up subscription.
+
+### EventStoreStreamCatchUpSubscription.stop()
+Request to stop the catch-up subscription.
+
+### EventStoreStreamCatchUpSubscription.getCorrelationId()
+Get the subscription ID of the underlying Event Store subscription, in order to pass it back to the Connection object, for example.
