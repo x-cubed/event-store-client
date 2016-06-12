@@ -133,7 +133,7 @@ declare module "event-store-client" {
 		/***
 		 * Helper function to create a new v4 UUID to use for event IDs or correlation IDs
 		 */
-		createGuid(): Buffer;
+		static createGuid(): Buffer;
 
 		/***
 		 * Deletes a stream from the server
