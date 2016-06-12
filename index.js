@@ -1,4 +1,4 @@
-var CatchUpSubscription = require("./lib/CatchUpSubscription"),
+var CatchUpSubscription = require("./lib/catchUpSubscription"),
     Connection = require("./lib/connection"),
     Commands            = require("./lib/commands"),
     ExpectedVersion     = require("./lib/expectedVersion"),
