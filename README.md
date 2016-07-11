@@ -33,6 +33,7 @@ Options is an object containing the following properties:
 * debug - A flag to toggle the output of packets to the console as they're sent and received (boolean, default: false)
 * onConnect - A function to be called with no parameters when the connection is established (function, default: no-op)
 * onError - A function to be called with a single parameter containing the error that was encountered (function, default: write error to console)
+* onClose - A function to be called with a single boolean parameter indicating if a transmission error was encountered (function, default: no-op)
 
 ### Connection.close()
 Closes the TCP connection. To re-establish the connection, construct a new Connection object.
