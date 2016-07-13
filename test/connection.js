@@ -33,6 +33,21 @@ describe('Connection', function() {
                 assert.fail("Should not have been able to send a ping across a failed connection");
             });
         });
+
+        it('should call close event handler', function(done) {
+            var options = {
+                host: defaultHostName,
+                onError: done,
+                onClose: function (hadError) {
+                    assert.notEqual(hadError, true);
+                    done();
+                }
+            };
+            var connection = new EventStoreClient.Connection(options);
+            connection.sendPing(function() {
+                connection.close();
+            });
+        });
     });
 
     describe('Reading from a stream', function() {
