@@ -38,8 +38,8 @@ describe('Connection', function() {
             var options = {
                 host: defaultHostName,
                 onError: done,
-                onClose: function (had_error) {
-                    assert.notEqual(had_error, true);
+                onClose: function (hadError) {
+                    assert.notEqual(hadError, true);
                     done();
                 }
             };
