@@ -119,6 +119,7 @@ Represents an event either before or after it has been stored.
 * eventId - A GUID uniquely identifying this event (string)
 * eventType - The type of event (string)
 * data - An object to be JSON-serialized as the data for the event (object, optional)
+* metadata - An object to be JSON-serialized as the metadata for the event (object, optional)
 
 ## StoredEvent class
 Represents an event as it exists on the Event Store server. Inherits from Event and adds the following properties:

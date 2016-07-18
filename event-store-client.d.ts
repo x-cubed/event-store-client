@@ -60,6 +60,7 @@ declare module "event-store-client" {
 		eventId: string;
 		eventType: string;
 		data: any;
+		metadata: any;
 	}
 
 	export interface StoredEvent extends Event {
