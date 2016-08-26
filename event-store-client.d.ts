@@ -116,6 +116,10 @@ declare module "event-store-client" {
 		reason: SubscriptionDropReason;
 	}
 
+	export interface ISubscriptionNotHandled {
+		reason: NotHandledReason;
+	}
+
 	/***
 	 * Represents a binary TCP connection to an instance of Event Store
 	 */
@@ -161,13 +165,14 @@ declare module "event-store-client" {
 		 * @param onConfirmed The callback to be fired once the server confirms that the subscription is in place
 		 * @param onDropped The callback to be fired when the server terminates the subscription
 		 * @param credentials The username and password needed to perform the operation on this stream
+ 		 * @param onNotHandled Invoked when the subscription request is not handled, for reason NotReady - 0, TooBusy - 1, or NotMaster - 2
 		 * @return {Buffer} The correlation ID for this subscription, needed for unsubscribeFromStream.
 		 */
-		subscribeToStream(streamId: string, resolveLinkTos: boolean, onEventAppeared: (event: StoredEvent) => void, onConfirmed: (confirmation: ISubscriptionConfirmation) => void, onDropped: (dropped: ISubscriptionDropped) => void, credentials: ICredentials): Buffer;
+		subscribeToStream(streamId: string, resolveLinkTos: boolean, onEventAppeared: (event: StoredEvent) => void, onConfirmed: (confirmation: ISubscriptionConfirmation) => void, onDropped: (dropped: ISubscriptionDropped) => void, credentials: ICredentials, onNotHandled: (notHandled: ISubscriptionNotHandled) => void): Buffer;
 
         /***
          * Initiate catch-up subscription for one stream.
-         * 
+         *
          * @param streamId The stream ID (only if subscribing to a single stream)
          * @param fromEventNumber Which event number to start after (if null, then from the beginning of the stream.)
          * @param credentials User credentials for the operations.
@@ -258,10 +263,10 @@ declare module "event-store-client" {
 
         /***
 		 * Creates a new settings instance.
-		 * @param maxLiveQueueSize The max amount to buffer when processing from live subscription. 
+		 * @param maxLiveQueueSize The max amount to buffer when processing from live subscription.
          * @param readBatchSize The number of events to read per batch when reading history
          * @param debug True iff in debug mode
-         * @param resolveLinkTos Whether or not to resolve link events 
+         * @param resolveLinkTos Whether or not to resolve link events
 		 */
         constructor(maxLiveQueueSize: number, readBatchSize: number, debug: boolean, resolveLinkTos: boolean);
 
@@ -281,7 +286,7 @@ declare module "event-store-client" {
         debug: boolean;
 
         /***
-	     * Whether or not to resolve link events 
+	     * Whether or not to resolve link events
 	     */
         resolveLinkTos: boolean;
     }
@@ -304,7 +309,7 @@ declare module "event-store-client" {
         constructor(connection: Connection, streamId: string, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription, string, Error) => void, settings: CatchUpSubscriptionSettings);
 
         /***
-         * Provides the correlation ID of the Event Store subscription underlying the catch-up subscription. 
+         * Provides the correlation ID of the Event Store subscription underlying the catch-up subscription.
          * @returns Correlation ID of the Event Store subscription
          */
         getCorrelationId(): string;

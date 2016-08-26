@@ -55,6 +55,7 @@ Subscribes to a stream to receive notifications as soon as an event is written t
 * onConfirmed - A function to be called when the server has confirmed that the subscription is running (function, takes in an [ISubscriptionConfirmation]((#isubscriptionconfirmation-interface)))
 * onDropped - A function to be called when the subscription is cancelled (function, takes in an [ISubscriptionDropped](#isubscriptiondropped-interface))
 * credentials - The user name and password needed for permission to subscribe to the stream ([ICredentials](#icredentials-interface), optional)
+* onNotHandled - A function to be called when the request for subscribition is not handled (function, takes in an [ISubscriptionNotHandled](#isubscriptionnothandled-interface))
 
 Returns a Buffer containing a GUID that identifies the subscription, for use with unsubscribeStream().
 
@@ -145,6 +146,11 @@ Passed to the onConfirmed callback used by subscribeToStream() when a subscripti
 Passed to the onDropped callback used by subscribeToStream() when a subscription terminates, or cannot be established.
 
 * reason - The reason why the subscription was dropped (enumeration, 0 = Unsubscribed, 1 = Access Denied)
+
+## ISubscriptionNotHandled interface
+Passed to the onNotHandled callback used by subscribeToStream() when a request to subscribe fails.
+
+* reason - The reason why the subscription failed (enumeration, 0 = NotReady, 1 = TooBusy, 2 = NotMaster)
 
 ## CatchUpSubscriptionSettings class
 A property bag of settings passed when creating a new catch-up subscription.
