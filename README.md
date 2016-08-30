@@ -55,7 +55,7 @@ Subscribes to a stream to receive notifications as soon as an event is written t
 * onConfirmed - A function to be called when the server has confirmed that the subscription is running (function, takes in an [ISubscriptionConfirmation]((#isubscriptionconfirmation-interface)))
 * onDropped - A function to be called when the subscription is cancelled (function, takes in an [ISubscriptionDropped](#isubscriptiondropped-interface))
 * credentials - The user name and password needed for permission to subscribe to the stream ([ICredentials](#icredentials-interface), optional)
-* onNotHandled - A function to be called when the request for subscribition is not handled (function, takes in an [ISubscriptionNotHandled](#isubscriptionnothandled-interface))
+* onNotHandled - A function to be called when the request for subscription is not handled (function, takes in an [ISubscriptionNotHandled](#isubscriptionnothandled-interface))
 
 Returns a Buffer containing a GUID that identifies the subscription, for use with unsubscribeStream().
 
