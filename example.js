@@ -80,7 +80,7 @@ var correlationId = connection.subscribeToStream(streamId, true, function(stream
         console.log("Unsubscribed");
         closeIfDone();
     });
-}, onSubscriptionConfirmed, onSubscriptionDropped, credentials);
+}, onSubscriptionConfirmed, onSubscriptionDropped, credentials, onSubscriptionNotHandled);
 
 function onEventAppeared(streamEvent) {
     if (streamEvent.streamId != streamId) {
@@ -120,4 +120,20 @@ function onSubscriptionDropped(dropped) {
             break;
     }
     console.log("Subscription dropped (" + reason + ")");
+}
+
+function onSubscriptionNotHandled(notHandled) {
+    var reason = notHandled.reason;
+    switch (notHandled.reason) {
+        case 0:
+            reason = "not ready - retry subscribing"
+            break;
+        case 1:
+            reason = "too busy - retry subscribing"
+            break;
+        case 2:
+            reason = "not master - reconnect to master node"
+            break;
+    }
+    console.log("Subscription not handled (" + reason + ")");
 }

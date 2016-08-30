@@ -33,6 +33,7 @@ Options is an object containing the following properties:
 * debug - A flag to toggle the output of packets to the console as they're sent and received (boolean, default: false)
 * onConnect - A function to be called with no parameters when the connection is established (function, default: no-op)
 * onError - A function to be called with a single parameter containing the error that was encountered (function, default: write error to console)
+* onClose - A function to be called with a single boolean parameter indicating if a transmission error was encountered (function, default: no-op)
 
 ### Connection.close()
 Closes the TCP connection. To re-establish the connection, construct a new Connection object.
@@ -54,8 +55,22 @@ Subscribes to a stream to receive notifications as soon as an event is written t
 * onConfirmed - A function to be called when the server has confirmed that the subscription is running (function, takes in an [ISubscriptionConfirmation]((#isubscriptionconfirmation-interface)))
 * onDropped - A function to be called when the subscription is cancelled (function, takes in an [ISubscriptionDropped](#isubscriptiondropped-interface))
 * credentials - The user name and password needed for permission to subscribe to the stream ([ICredentials](#icredentials-interface), optional)
+* onNotHandled - A function to be called when the request for subscription is not handled (function, takes in an [ISubscriptionNotHandled](#isubscriptionnothandled-interface))
 
 Returns a Buffer containing a GUID that identifies the subscription, for use with unsubscribeStream().
+
+### Connection.subscribeToStreamFrom()
+Executes a catch-up subscription on the given stream, reading events from a given event number, and continuing with a live subscription when all historical events have been read.
+
+* streamId - The name of the stream in the Event Store (string)
+* fromEventNumber - Which event number to start after (if null, then from the beginning of the stream.)
+* credentials - The user name and password needed for permission to subscribe to the stream.
+* onEventAppeared - Callback for each event received (historical or live)
+* onLiveProcessingStarted - Callback when historical events have been read and live events are about to be read.
+* onDropped - Callback when subscription drops or is dropped.
+* settings - Settings for the catch-up subscription.
+
+Returns an instance representing the catch-up subscription (EventStoreStreamCatchUpSubscription).
 
 ### Connection.readAllEventsBackward() / Connection.readAllEventsForward()
 Reads events from across all streams, in order (backward = newest first, forward = oldest first).
@@ -105,13 +120,15 @@ Represents an event either before or after it has been stored.
 * eventId - A GUID uniquely identifying this event (string)
 * eventType - The type of event (string)
 * data - An object to be JSON-serialized as the data for the event (object, optional)
+* metadata - An object to be JSON-serialized as the metadata for the event (object, optional)
 
 ## StoredEvent class
 Represents an event as it exists on the Event Store server. Inherits from Event and adds the following properties:
 
 * streamId - The name of the Event Store stream that this event was stored in (string)
-* number - The sequence number for this event within the stream (number)
+* eventNumber - The sequence number for this event within the stream (number)
 * created - The date that this event was stored in the Event Store (date)
+* link - If event was read from a stream using the resolveLinkTos flag, will contain the original link data (from before the event was resolved.) (StoredEvent)
 
 ## ICredentials interface
 An object containing credentials for access to secured resources.
@@ -129,3 +146,28 @@ Passed to the onConfirmed callback used by subscribeToStream() when a subscripti
 Passed to the onDropped callback used by subscribeToStream() when a subscription terminates, or cannot be established.
 
 * reason - The reason why the subscription was dropped (enumeration, 0 = Unsubscribed, 1 = Access Denied)
+
+## ISubscriptionNotHandled interface
+Passed to the onNotHandled callback used by subscribeToStream() when a request to subscribe fails.
+
+* reason - The reason why the subscription failed (enumeration, 0 = NotReady, 1 = TooBusy, 2 = NotMaster)
+
+## CatchUpSubscriptionSettings class
+A property bag of settings passed when creating a new catch-up subscription.
+
+* maxLiveQueueSize - The maximum amount to buffer when processing from the live subscription.
+* readBatchSize - The number of events to read per batch when reading historical events.
+* debug - True if in debug mode.
+* resolveLinkTos - Whether or not to resolve link events.
+
+## EventStoreStreamCatchUpSubscription class
+Represents a catch-up subscription to a single stream. 
+
+### EventStoreStreamCatchUpSubscription.start()
+Initiate start of the catch-up subscription.
+
+### EventStoreStreamCatchUpSubscription.stop()
+Request to stop the catch-up subscription.
+
+### EventStoreStreamCatchUpSubscription.getCorrelationId()
+Get the subscription ID of the underlying Event Store subscription, in order to pass it back to the Connection object, for example.
