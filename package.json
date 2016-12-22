@@ -4,6 +4,7 @@
   "description": "Client library for connecting to Event Store instances over TCP/IP",
   "author": "Carey Bishop",
   "license": "BSD-2-Clause",
+  "types": "./event-store-client.d.ts",
   "repository" : {
     "type" : "git",
     "url" : "http://github.com/x-cubed/event-store-client.git"
