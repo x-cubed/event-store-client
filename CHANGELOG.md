@@ -1,3 +1,6 @@
+0.0.11 (4 March 2017)
+- FIX: added types property to the package.json so that TypeScript 2+ can find the type definitions file (guyspronck)
+
 0.0.10 (30 August 2016)
 - FEATURE: support for handling subscriptions that are received by the server but unable to be handled at the time (joeywinsford)
 
