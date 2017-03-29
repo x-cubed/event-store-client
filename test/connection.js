@@ -50,65 +50,6 @@ describe('Connection', function() {
         });
     });
 
-    describe('Reading from a stream', function() {
-        it("should read 10 events from the stats stream backwards", function(done) {
-            var options = {
-                host: defaultHostName,
-                onError: done
-            };
-
-            var readEvents = 0;
-
-            var streamId = "$stats-0.0.0.0:2113";
-            var fromEventNumber = -1;
-            var maxCount = 10;
-            var resolveLinkTos = false;
-            var requireMaster = false;
-            var onEventAppeared = function (event) {
-                readEvents++;
-            };
-
-            var connection = new EventStoreClient.Connection(options);
-            connection.readStreamEventsBackward(streamId, fromEventNumber, maxCount, resolveLinkTos, requireMaster, onEventAppeared, credentials, function (completed) {
-                assert.equal(completed.result, EventStoreClient.ReadStreamResult.Success,
-                    "Expected a result code of Success, not " + EventStoreClient.ReadStreamResult.getName(completed.result)
-                );
-                assert.ok(readEvents > 0, "Expected to read at least one event");
-
-                connection.close();
-                done();
-            });
-        });
-        it("should read 10 events from the stats stream forwards", function(done) {
-            var options = {
-                host: defaultHostName,
-                onError: done
-            };
-
-            var readEvents = 0;
-
-            var streamId = "$stats-0.0.0.0:2113";
-            var fromEventNumber = 0;
-            var maxCount = 10;
-            var resolveLinkTos = false;
-            var requireMaster = false;
-            var onEventAppeared = function (event) {
-                readEvents++;
-            };
-
-            var connection = new EventStoreClient.Connection(options);
-            connection.readStreamEventsForward(streamId, fromEventNumber, maxCount, resolveLinkTos, requireMaster, onEventAppeared, credentials, function (completed) {
-                assert.equal(completed.result, EventStoreClient.ReadStreamResult.Success,
-                    "Expected a result code of Success, not " + EventStoreClient.ReadStreamResult.getName(completed.result)
-                );
-                assert.ok(readEvents > 0, "Expected to read at least one event");
-
-                connection.close();
-                done();
-            });
-        });
-    });
-
     describe('Writing to a stream', function() {
         it("should be able to write 1 event with a binary GUID to the end of the stream", function(done) {
             var options = {

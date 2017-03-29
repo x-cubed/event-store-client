@@ -7,7 +7,7 @@
 
     var EventStoreClient = require("../../index.js");
 
-    dbconn.defaultHostName = "eventstore";
+    dbconn.defaultHostName = process.env.EVENTSTORE_HOST || "eventstore";
     dbconn.credentials = {
         username: "admin",
         password: "changeit"

@@ -2,6 +2,12 @@ Event Store Client
 ==================
 Author: Carey Bishop
 
+<div class="repo-badge">
+  <a href="#" id="status-image-popup" name="status-images" class="open-popup" title="Latest push build on default branch: ">
+    <img src="https://travis-ci.org/pauldambra/event-store-client.svg" alt="build:">
+  </a>
+</div>
+
 Connects to an [Event Store](http://geteventstore.com) server over TCP/IP, to send and receive event information.
 
 The Javascript API is intended to mimic the .Net API as closely as possible.
@@ -171,3 +177,13 @@ Request to stop the catch-up subscription.
 
 ### EventStoreStreamCatchUpSubscription.getCorrelationId()
 Get the subscription ID of the underlying Event Store subscription, in order to pass it back to the Connection object, for example.
+
+# Build & CI
+
+This library is built and tested with Travis CI. 
+
+To run locally run `EVENTSTORE_HOST=127.0.0.1 ./build.sh`. 
+
+Currently this runs by default on Mac OSX. You can set the script to download the Ubuntu build
+
+`EVENTSTORE_HOST="127.0.0.1" ES_DOWNLOAD_URL="http://download.geteventstore.com/binaries/EventStore-OSS-Ubuntu-14.04-v3.9.1.tar.gz" ./build.sh`
