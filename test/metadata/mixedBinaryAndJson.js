@@ -111,4 +111,52 @@ describe("Mixed Event Data and Metadata Types", function() {
 			}
 		});
 	});
+
+	describe("Event with empty string data", function() {
+
+		var testEventNumber = null;
+
+		var data = "";
+		var metadata = "";
+
+		before("Write a test event with empty string", function(done) {
+			var events = [{
+				eventId: EventStoreClient.Connection.createGuid(),
+				eventType: "EmptyStringDataTestEvent",
+				data: data,
+				metadata: metadata
+			}];
+
+			var connection = new EventStoreClient.Connection({ host: defaultHostName, onError: done });
+			connection.writeEvents(streamId, EventStoreClient.ExpectedVersion.Any, false, events, credentials, function(completed) {
+				testEventNumber = completed.firstEventNumber;
+				connection.close();
+				done();
+			});
+		});
+
+		it('should read event with empty string data', function(done) {
+			var testEvent = null;
+			var readSingleEvent = 1;
+
+			var connection = new EventStoreClient.Connection({ host: defaultHostName, onError: done });
+			connection.readStreamEventsBackward(streamId, testEventNumber, readSingleEvent, false, false, onEventAppeared, credentials, onCompleted);
+
+			function onEventAppeared(event) { testEvent = event; }
+
+			function onCompleted(completed) {
+				assert.equal(completed.result, EventStoreClient.ReadStreamResult.Success,
+					"Expected a result code of Success, not " + EventStoreClient.ReadStreamResult.getName(completed.result));
+
+				assert.ok(testEvent.isJson === false,
+					"Expected event to have binary data");
+
+				assert.equal("", testEvent.data.toString(),
+					"Expected data to match string " + data)
+
+				connection.close();
+				done();
+			}
+		});
+	});
 });
