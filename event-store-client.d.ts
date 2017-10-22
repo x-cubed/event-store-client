@@ -182,7 +182,7 @@ declare module "event-store-client" {
          * @param settings Settings for this subscription.
          * @return The catch-up subscription instance.
          */
-        subscribeToStreamFrom(streamId: string, fromEventNumber: number, credentials: ICredentials, onEventAppeared: (event: StoredEvent) => void, onLiveProcessingStarted: () => void, onDropped: (EventStoreCatchUpSubscription, string, Error) => void, settings: CatchUpSubscriptionSettings): EventStoreStreamCatchUpSubscription;
+        subscribeToStreamFrom(streamId: string, fromEventNumber: number, credentials: ICredentials, onEventAppeared: (event: StoredEvent) => void, onLiveProcessingStarted: () => void, onDropped: (EventStoreCatchUpSubscription: any, reason: string, Error: any) => void, settings: CatchUpSubscriptionSettings): EventStoreStreamCatchUpSubscription;
 
 		/***
 		 * Reads events from across all streams, in order from newest to oldest
@@ -306,7 +306,7 @@ declare module "event-store-client" {
          * @param subscriptionDropped Callback when subscription drops or is dropped.
          * @param settings Settings for this subscription.
 		 */
-        constructor(connection: Connection, streamId: string, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription, string, Error) => void, settings: CatchUpSubscriptionSettings);
+        constructor(connection: Connection, streamId: string, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription: any, reason: string, Error: any) => void, settings: CatchUpSubscriptionSettings);
 
         /***
          * Provides the correlation ID of the Event Store subscription underlying the catch-up subscription.
@@ -341,6 +341,6 @@ declare module "event-store-client" {
          * @param subscriptionDropped Callback when subscription drops or is dropped.
          * @param settings Settings for this subscription.
 		 */
-        constructor(connection: Connection, streamId: string, fromEventNumberExclusive: number, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription, string, Error) => void, settings: CatchUpSubscriptionSettings);
+        constructor(connection: Connection, streamId: string, fromEventNumberExclusive: number, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription: any, reason: string, Error: any) => void, settings: CatchUpSubscriptionSettings);
     }
 }
