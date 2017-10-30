@@ -9,6 +9,8 @@ The Javascript API is intended to mimic the .Net API as closely as possible.
 For an example of how to use it, see [example.js](example.js).
 
 # Installation
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fx-cubed%2Fevent-store-client.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fx-cubed%2Fevent-store-client?ref=badge_shield)
+
 At the command-line:
 > npm install event-store-client
 
@@ -171,3 +173,7 @@ Request to stop the catch-up subscription.
 
 ### EventStoreStreamCatchUpSubscription.getCorrelationId()
 Get the subscription ID of the underlying Event Store subscription, in order to pass it back to the Connection object, for example.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fx-cubed%2Fevent-store-client.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fx-cubed%2Fevent-store-client?ref=badge_large)
