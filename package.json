@@ -5,16 +5,17 @@
   "author": "Carey Bishop",
   "license": "BSD-2-Clause",
   "types": "./event-store-client.d.ts",
-  "repository" : {
-    "type" : "git",
-    "url" : "http://github.com/x-cubed/event-store-client.git"
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/x-cubed/event-store-client.git"
   },
   "main": "index.js",
   "dependencies": {
-    "protobufjs": "~5.0.1",
-    "node-uuid": "~1.4.1",
+    "argument-validator": "^0.1.0",
     "long": "~3.1.0",
-    "argument-validator": "^0.1.0"
+    "protobufjs": "~5.0.1",
+    "uuid": "^3.2.1",
+    "uuid-parse": "^1.0.0"
   },
   "devDependencies": {
     "mocha-teamcity-reporter": "~1.0.0",

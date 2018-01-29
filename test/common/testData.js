@@ -3,14 +3,14 @@
  */
 (function (testData) {
 
-    var uuid = require('node-uuid');
+    var uuidv4 = require('uuid/v4');
     var EventStoreClient = require("../../index.js");
 
     /**
      * Returns a stream name composed of the prefix "test-" and a random UUID.
      */
     testData.randomStreamName = function() {
-        return 'test-' + uuid.v4();
+        return 'test-' + uuidv4();
     };
 
     /**
@@ -18,7 +18,7 @@
      */
     testData.fooEvent = function() {
         return {
-            eventId: uuid.v4(),
+            eventId: uuidv4(),
             eventType: 'ThingHappened',
             data: { foo: true }
         };

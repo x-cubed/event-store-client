@@ -1,5 +1,5 @@
-var assert = require("assert");
-var uuid   = require('node-uuid');
+var assert    =  require("assert");
+var uuidParse = require('uuid-parse')
 
 var EventStoreClient = require("../index.js");
 var dbconn = require("./common/dbconn");
@@ -175,7 +175,7 @@ describe('Connection', function() {
             var expectedVersion = EventStoreClient.ExpectedVersion.Any;
             var requireMaster = false;
             var events = [{
-                eventId: uuid.unparse(EventStoreClient.Connection.createGuid()),
+                eventId: uuidParse.unparse(EventStoreClient.Connection.createGuid()),
                 eventType: "TestEvent",
                 data: {
                     testRanAt: new Date().toISOString()
