@@ -1,3 +1,6 @@
+1.0.0 (3 February 2018)
+- CHANGE: Upgrade from deprecated node-uuid to uuid package (ImmaculatePine)
+
 0.0.11 (4 March 2017)
 - FIX: added types property to the package.json so that TypeScript 2+ can find the type definitions file (guyspronck)
 
