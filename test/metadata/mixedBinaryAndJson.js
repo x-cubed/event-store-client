@@ -4,6 +4,7 @@ var dbconn = require("../common/dbconn");
 
 var defaultHostName = dbconn.defaultHostName;
 var credentials = dbconn.credentials;
+var port = dbconn.port;
 
 var streamId = "event-store-client-test";
 
@@ -24,19 +25,19 @@ describe("Mixed Event Data and Metadata Types", function() {
 				metadata: metadata
 			}];
 
-			var connection = new EventStoreClient.Connection({ host: defaultHostName, onError: done });
+			var connection = new EventStoreClient.Connection({ host: defaultHostName, port: port, onError: done });
 			connection.writeEvents(streamId, EventStoreClient.ExpectedVersion.Any, false, events, credentials, function(completed) {
 				testEventNumber = completed.firstEventNumber;
 				connection.close();
 				done();
-			});            
+			});
 		});
 
 		it("should parse binary and JSON values correctly", function(done) {
 			var testEvent = null;
-			var readSingleEvent = 1;    
+			var readSingleEvent = 1;
 
-			var connection = new EventStoreClient.Connection({ host: defaultHostName, onError: done });
+			var connection = new EventStoreClient.Connection({ host: defaultHostName, port: port, onError: done });
 			connection.readStreamEventsBackward(streamId, testEventNumber, readSingleEvent, false, false, onEventAppeared, credentials, onCompleted);
 
 			function onEventAppeared(event) { testEvent = event; }
@@ -45,7 +46,7 @@ describe("Mixed Event Data and Metadata Types", function() {
 				assert.equal(completed.result, EventStoreClient.ReadStreamResult.Success,
 					"Expected a result code of Success, not " + EventStoreClient.ReadStreamResult.getName(completed.result));
 
-				assert.ok(testEvent.isJson === true, 
+				assert.ok(testEvent.isJson === true,
 					"Expected event to have JSON data");
 
 				assert.equal(data.comment, testEvent.data.comment,
@@ -76,19 +77,19 @@ describe("Mixed Event Data and Metadata Types", function() {
 				metadata: metadata
 			}];
 
-			var connection = new EventStoreClient.Connection({ host: defaultHostName, onError: done });
+			var connection = new EventStoreClient.Connection({ host: defaultHostName, port: port, onError: done });
 			connection.writeEvents(streamId, EventStoreClient.ExpectedVersion.Any, false, events, credentials, function(completed) {
 				testEventNumber = completed.firstEventNumber;
 				connection.close();
 				done();
-			});            
+			});
 		});
 
 		it("should parse binary and JSON values correctly", function(done) {
 			var testEvent = null;
-			var readSingleEvent = 1;    
+			var readSingleEvent = 1;
 
-			var connection = new EventStoreClient.Connection({ host: defaultHostName, onError: done });
+			var connection = new EventStoreClient.Connection({ host: defaultHostName, port: port, onError: done });
 			connection.readStreamEventsBackward(streamId, testEventNumber, readSingleEvent, false, false, onEventAppeared, credentials, onCompleted);
 
 			function onEventAppeared(event) { testEvent = event; }
@@ -97,9 +98,9 @@ describe("Mixed Event Data and Metadata Types", function() {
 				assert.equal(completed.result, EventStoreClient.ReadStreamResult.Success,
 					"Expected a result code of Success, not " + EventStoreClient.ReadStreamResult.getName(completed.result));
 
-				assert.ok(testEvent.isJson === false, 
+				assert.ok(testEvent.isJson === false,
 					"Expected event to have binary data");
-				
+
 				assert.equal(data, testEvent.data.toString(),
 					"Expected data to match string " + data)
 

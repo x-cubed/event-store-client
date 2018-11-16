@@ -1,5 +1,6 @@
 var CatchUpSubscription = require("./lib/catchUpSubscription"),
-    Connection = require("./lib/connection"),
+    Connection          = require("./lib/connection"),
+    TlsConnection       = require("./lib/tlsConnection"),
     Commands            = require("./lib/commands"),
     ExpectedVersion     = require("./lib/expectedVersion"),
     Messages            = require("./lib/messages"),
@@ -9,12 +10,13 @@ var CatchUpSubscription = require("./lib/catchUpSubscription"),
     EventStoreClient    = {};
 
 EventStoreClient.CatchUpSubscription = CatchUpSubscription;
-EventStoreClient.Connection         = Connection;
-EventStoreClient.Commands           = Commands;
-EventStoreClient.ExpectedVersion    = ExpectedVersion;
-EventStoreClient.Messages           = Messages;
-EventStoreClient.OperationResult    = OperationResult;
-EventStoreClient.ReadAllResult      = ReadAllResult;
-EventStoreClient.ReadStreamResult   = ReadStreamResult;
+EventStoreClient.Connection          = Connection;
+EventStoreClient.TlsConnection       = TlsConnection;
+EventStoreClient.Commands            = Commands;
+EventStoreClient.ExpectedVersion     = ExpectedVersion;
+EventStoreClient.Messages            = Messages;
+EventStoreClient.OperationResult     = OperationResult;
+EventStoreClient.ReadAllResult       = ReadAllResult;
+EventStoreClient.ReadStreamResult    = ReadStreamResult;
 
 module.exports = EventStoreClient;

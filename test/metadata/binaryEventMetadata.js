@@ -4,6 +4,7 @@ var dbconn = require("../common/dbconn");
 
 var defaultHostName = dbconn.defaultHostName;
 var credentials = dbconn.credentials;
+var port = dbconn.port;
 
 var streamId = "event-store-client-test";
 
@@ -12,7 +13,7 @@ describe("Binary Event Metadata", function() {
 
         var testEventNumber = null;
         var testRunDate = new Date().toISOString();
-        
+
         before("Write a test event with binary metadata", function(done) {
             var events = [{
                 eventId: EventStoreClient.Connection.createGuid(),
@@ -21,19 +22,19 @@ describe("Binary Event Metadata", function() {
                 metadata: new Buffer(testRunDate)
             }];
 
-            var connection = new EventStoreClient.Connection({ host: defaultHostName, onError: done });
+            var connection = new EventStoreClient.Connection({ host: defaultHostName, port: port, onError: done });
             connection.writeEvents(streamId, EventStoreClient.ExpectedVersion.Any, false, events, credentials, function(completed) {
                 testEventNumber = completed.firstEventNumber;
                 connection.close();
                 done();
-            });            
+            });
         });
 
         it("should have binary metadata on the event", function(done) {
             var testEvent = null;
-            var readSingleEvent = 1;    
+            var readSingleEvent = 1;
 
-            var connection = new EventStoreClient.Connection({ host: defaultHostName, onError: done });
+            var connection = new EventStoreClient.Connection({ host: defaultHostName, port: port, onError: done });
             connection.readStreamEventsBackward(streamId, testEventNumber, readSingleEvent, false, false, onEventAppeared, credentials, onCompleted);
 
             function onEventAppeared(event) { testEvent = event; }
@@ -42,7 +43,7 @@ describe("Binary Event Metadata", function() {
                 assert.equal(completed.result, EventStoreClient.ReadStreamResult.Success,
                     "Expected a result code of Success, not " + EventStoreClient.ReadStreamResult.getName(completed.result));
 
-                assert.ok(testEvent.isJson === false, 
+                assert.ok(testEvent.isJson === false,
                     "Expected event to have JSON data");
 
                 assert.equal(testRunDate, testEvent.metadata.toString(),

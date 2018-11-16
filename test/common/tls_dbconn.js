@@ -18,7 +18,7 @@
         hostName = hostName || dbconn.defaultHostName;
         credentials = credentials || dbconn.credentials;
         port = port || dbconn.port;
-        
+
         var connectionError = null;
 
         var options = {
@@ -27,7 +27,7 @@
             onError: onFail
         };
 
-        var connection = new EventStoreClient.Connection(options);
+        var connection = new EventStoreClient.TlsConnection(options);
         if (connection) onSuccess(connection);
     };
 

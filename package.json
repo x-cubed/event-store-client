@@ -17,7 +17,7 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
-    "mocha": "~2.5.3",
+    "mocha": "^5.2.0",
     "mocha-teamcity-reporter": "~1.0.0",
     "optimist": "~0.6.1",
     "uuid-parse": "^1.0.0"

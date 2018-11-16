@@ -2,20 +2,20 @@ var assert    =  require("assert");
 var uuidParse = require('uuid-parse')
 
 var EventStoreClient = require("../index.js");
-var dbconn = require("./common/dbconn");
+var dbconn = require("./common/tls_dbconn");
 var defaultHostName = dbconn.defaultHostName;
 var credentials = dbconn.credentials;
 var port = dbconn.port;
 
-describe('Connection', function() {
-    describe('Establishing a connection', function() {
+describe('TlsConnection', function() {
+    describe('Establishing a tls connection', function() {
         it('should connect successfully to eventstore', function(done) {
             var options = {
                 host: defaultHostName,
                 port: port,
                 onError: done
             };
-            var connection = new EventStoreClient.Connection(options);
+            var connection = new EventStoreClient.TlsConnection(options);
             connection.sendPing(function() {
                 connection.close();
                 done();
@@ -25,12 +25,13 @@ describe('Connection', function() {
         it('should fail to connect to nosuchhost.example.com', function(done) {
             var options = {
                 host: "nosuchhost.example.com",
+                port: port,
                 onError: function(err) {
                     assert.equal(err.code, "ENOTFOUND", "Expected to get an ENOTFOUND error as the host does not exist");
                     done();
                 }
             };
-            var connection = new EventStoreClient.Connection(options);
+            var connection = new EventStoreClient.TlsConnection(options);
             connection.sendPing(function() {
                 assert.fail("Should not have been able to send a ping across a failed connection");
             });
@@ -46,7 +47,7 @@ describe('Connection', function() {
                     done();
                 }
             };
-            var connection = new EventStoreClient.Connection(options);
+            var connection = new EventStoreClient.TlsConnection(options);
             connection.sendPing(function() {
                 connection.close();
             });
@@ -72,7 +73,7 @@ describe('Connection', function() {
                 readEvents++;
             };
 
-            var connection = new EventStoreClient.Connection(options);
+            var connection = new EventStoreClient.TlsConnection(options);
             connection.readStreamEventsBackward(streamId, fromEventNumber, maxCount, resolveLinkTos, requireMaster, onEventAppeared, credentials, function (completed) {
                 assert.equal(completed.result, EventStoreClient.ReadStreamResult.Success,
                     "Expected a result code of Success, not " + EventStoreClient.ReadStreamResult.getName(completed.result)
@@ -101,7 +102,7 @@ describe('Connection', function() {
                 readEvents++;
             };
 
-            var connection = new EventStoreClient.Connection(options);
+            var connection = new EventStoreClient.TlsConnection(options);
             connection.readStreamEventsForward(streamId, fromEventNumber, maxCount, resolveLinkTos, requireMaster, onEventAppeared, credentials, function (completed) {
                 assert.equal(completed.result, EventStoreClient.ReadStreamResult.Success,
                     "Expected a result code of Success, not " + EventStoreClient.ReadStreamResult.getName(completed.result)
@@ -126,14 +127,14 @@ describe('Connection', function() {
             var expectedVersion = EventStoreClient.ExpectedVersion.Any;
             var requireMaster = false;
             var events = [{
-                eventId: EventStoreClient.Connection.createGuid(),
+                eventId: EventStoreClient.TlsConnection.createGuid(),
                 eventType: "TestEvent",
                 data: {
                     testRanAt: new Date().toISOString()
                 }
             }];
 
-            var connection = new EventStoreClient.Connection(options);
+            var connection = new EventStoreClient.TlsConnection(options);
             connection.writeEvents(streamId, expectedVersion, requireMaster, events, credentials, function (completed) {
                 assert.equal(completed.result, EventStoreClient.OperationResult.Success,
                     "Expected a result code of Success, not " + EventStoreClient.OperationResult.getName(completed.result) + ": " + completed.message
@@ -154,14 +155,14 @@ describe('Connection', function() {
             var expectedVersion = EventStoreClient.ExpectedVersion.Any;
             var requireMaster = false;
             var events = [{
-                eventId: EventStoreClient.Connection.createGuid().toString('hex'),
+                eventId: EventStoreClient.TlsConnection.createGuid().toString('hex'),
                 eventType: "TestEvent",
                 data: {
                     testRanAt: new Date().toISOString()
                 }
             }];
 
-            var connection = new EventStoreClient.Connection(options);
+            var connection = new EventStoreClient.TlsConnection(options);
             connection.writeEvents(streamId, expectedVersion, requireMaster, events, credentials, function (completed) {
                 assert.equal(completed.result, EventStoreClient.OperationResult.Success,
                     "Expected a result code of Success, not " + EventStoreClient.OperationResult.getName(completed.result) + ": " + completed.message
@@ -183,14 +184,14 @@ describe('Connection', function() {
             var expectedVersion = EventStoreClient.ExpectedVersion.Any;
             var requireMaster = false;
             var events = [{
-                eventId: uuidParse.unparse(EventStoreClient.Connection.createGuid()),
+                eventId: uuidParse.unparse(EventStoreClient.TlsConnection.createGuid()),
                 eventType: "TestEvent",
                 data: {
                     testRanAt: new Date().toISOString()
                 }
             }];
 
-            var connection = new EventStoreClient.Connection(options);
+            var connection = new EventStoreClient.TlsConnection(options);
             connection.writeEvents(streamId, expectedVersion, requireMaster, events, credentials, function (completed) {
                 assert.equal(completed.result, EventStoreClient.OperationResult.Success,
                     "Expected a result code of Success, not " + EventStoreClient.OperationResult.getName(completed.result) + ": " + completed.message
