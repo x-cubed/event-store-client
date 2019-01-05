@@ -19,6 +19,7 @@
   "devDependencies": {
     "mocha": "^5.2.0",
     "mocha-teamcity-reporter": "~2.5.1",
+    "node-docker-api": "^1.1.22",
     "optimist": "~0.6.1",
     "uuid-parse": "^1.0.0"
   },
