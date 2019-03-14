@@ -1,3 +1,6 @@
+1.0.1 (5 January 2019)
+- CHANGE: Run the tests inside a Docker container for reproducibility and to provide a path forward for testing TLS support (x-cubed)
+
 1.0.0 (3 February 2018)
 - CHANGE: Upgrade from deprecated node-uuid to uuid package (ImmaculatePine)
 
