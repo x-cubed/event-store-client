@@ -9,7 +9,7 @@ var port = dbconn.port;
 
 describe('Connection', function() {
     describe('Establishing a connection', function() {
-        it('should connect successfully to eventstore', function(done) {
+        it('should connect successfully to eventstore via tcp', function(done) {
             var options = {
                 host: defaultHostName,
                 port: port,

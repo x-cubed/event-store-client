@@ -1,3 +1,5 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 var assert    =  require("assert");
 var uuidParse = require('uuid-parse')
 
@@ -9,7 +11,7 @@ var port = dbconn.port;
 
 describe('TlsConnection', function() {
     describe('Establishing a tls connection', function() {
-        it('should connect successfully to eventstore', function(done) {
+        it('should connect successfully to eventstore via tls', function(done) {
             var options = {
                 host: defaultHostName,
                 port: port,

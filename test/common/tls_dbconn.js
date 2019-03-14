@@ -7,12 +7,12 @@
 
     var EventStoreClient = require("../../index.js");
 
-    dbconn.defaultHostName = "eventstore";
+    dbconn.defaultHostName = "127.0.0.1";
     dbconn.credentials = {
         username: "admin",
         password: "changeit"
     };
-    dbconn.port = 1113;
+    dbconn.port = 1115;
 
     dbconn.open = function (onFail, onSuccess, hostName, credentials, port) {
         hostName = hostName || dbconn.defaultHostName;
