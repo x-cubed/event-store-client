@@ -7,18 +7,18 @@
 
     var EventStoreClient = require("../../index.js");
 
-    dbconn.defaultHostName = "eventstore";
+    dbconn.defaultHostName = "127.0.0.1";
     dbconn.credentials = {
         username: "admin",
         password: "changeit"
     };
-    dbconn.port = 1113;
+    dbconn.port = 1115;
 
     dbconn.open = function (onFail, onSuccess, hostName, credentials, port) {
         hostName = hostName || dbconn.defaultHostName;
         credentials = credentials || dbconn.credentials;
         port = port || dbconn.port;
-        
+
         var connectionError = null;
 
         var options = {
@@ -27,7 +27,7 @@
             onError: onFail
         };
 
-        var connection = new EventStoreClient.Connection(options);
+        var connection = new EventStoreClient.TlsConnection(options);
         if (connection) onSuccess(connection);
     };
 

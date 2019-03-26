@@ -123,7 +123,7 @@ declare module "event-store-client" {
 	/***
 	 * Represents a binary TCP connection to an instance of Event Store
 	 */
-	export class Connection {
+	class BaseConnection {
 		/***
 		 * Creates a new TCP connection the Event Store host
 		 * @param options host - the IP address or host name of the host to connect to, port - the TCP port number to connect on, debug - optional boolean flag to enable debug output to the console
@@ -254,7 +254,10 @@ declare module "event-store-client" {
 		 * @param callback Invoked once the operation has been completed. Check the result to confirm it was successful.
 		 */
 		writeEvents(streamId: string, expectedVersion: number, requireMaster: boolean, events: Event[], credentials: ICredentials, callback: (completed: IWriteEventsCompleted) => void): void;
-    }
+		}
+		
+		export class Connection extends BaseConnection {}
+		export class TlsConnection extends BaseConnection {}
 
     /***
 	 * Configuration settings to pass when instantiating a catch-up subscription.

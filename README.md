@@ -24,7 +24,19 @@ A Typescript type definition is available in [event-store-client.d.ts](event-sto
 The core class in this library, represents a single TCP connection to an Event Store server.
 
 ### new EventStore.Connection(options)
-Creates a new Connection object and establishes a binary TCP connection the Event Store server.
+Creates a new Connection object and establishes a binary TCP connection to the Event Store server.
+
+Options is an object containing the following properties:
+
+* host - The domain name or IP address of the Event Store server (string, default: localhost)
+* port - The port number to use (number, default: 1113)
+* debug - A flag to toggle the output of packets to the console as they're sent and received (boolean, default: false)
+* onConnect - A function to be called with no parameters when the connection is established (function, default: no-op)
+* onError - A function to be called with a single parameter containing the error that was encountered (function, default: write error to console)
+* onClose - A function to be called with a single boolean parameter indicating if a transmission error was encountered (function, default: no-op)
+
+### new EventStore.TlsConnection(options)
+Creates a new TLS Secured Connection object and establishes a binary TCP connection over SSL to the Event Store server. *** SERVER MUST USE VALID CERTIFICATE ***
 
 Options is an object containing the following properties:
 
@@ -161,7 +173,7 @@ A property bag of settings passed when creating a new catch-up subscription.
 * resolveLinkTos - Whether or not to resolve link events.
 
 ## EventStoreStreamCatchUpSubscription class
-Represents a catch-up subscription to a single stream. 
+Represents a catch-up subscription to a single stream.
 
 ### EventStoreStreamCatchUpSubscription.start()
 Initiate start of the catch-up subscription.

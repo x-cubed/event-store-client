@@ -25,13 +25,24 @@ before('Run Docker', async function() {
 	// Start a new Event Store container
 	container = await docker.container.create({
 		Image: imageName,
+		Env: [
+			'EVENTSTORE_CERTIFICATE_FILE=/var/lib/eventstore/certs/eventstore.p12', 
+			'EVENTSTORE_EXT_SECURE_TCP_PORT=1115',
+			'MEM_DB=1',
+		],
+		ExposedPorts: {
+			"1115/tcp": { }
+		},
 		HostConfig: {
+			Binds: [
+				`${__dirname}:/var/lib/eventstore/certs`
+			],
 			PortBindings: {
 				"1113/tcp": [
 					{ HostPort: "1113" }
 				],
-				"1114/tcp": [
-					{ HostPort: "1114" }
+				"1115/tcp": [
+					{ HostPort: "1115" }
 				],
 				"2113/tcp": [
 					{ HostPort: "2113" }
