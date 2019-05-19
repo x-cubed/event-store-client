@@ -5,14 +5,14 @@ declare module "event-store-client" {
 	}
 
 	export enum OperationResult {
-	    Success = 0,
-	    PrepareTimeout = 1,
-	    CommitTimeout = 2,
-	    ForwardTimeout = 3,
-	    WrongExpectedVersion = 4,
-	    StreamDeleted = 5,
-	    InvalidTransaction = 6,
-	    AccessDenied = 7
+		Success = 0,
+		PrepareTimeout = 1,
+		CommitTimeout = 2,
+		ForwardTimeout = 3,
+		WrongExpectedVersion = 4,
+		StreamDeleted = 5,
+		InvalidTransaction = 6,
+		AccessDenied = 7
 	}
 
 	export enum ReadEventResult {
@@ -182,7 +182,7 @@ declare module "event-store-client" {
          * @param settings Settings for this subscription.
          * @return The catch-up subscription instance.
          */
-        subscribeToStreamFrom(streamId: string, fromEventNumber: number, credentials: ICredentials, onEventAppeared: (event: StoredEvent) => void, onLiveProcessingStarted: () => void, onDropped: (EventStoreCatchUpSubscription: any, reason: string, Error: any) => void, settings: CatchUpSubscriptionSettings): EventStoreStreamCatchUpSubscription;
+		subscribeToStreamFrom(streamId: string, fromEventNumber: number | null, credentials: ICredentials, onEventAppeared: (event: StoredEvent) => void, onLiveProcessingStarted: () => void, onDropped: (EventStoreCatchUpSubscription: any, reason: string, Error: any) => void, settings: CatchUpSubscriptionSettings): EventStoreStreamCatchUpSubscription;
 
 		/***
 		 * Reads events from across all streams, in order from newest to oldest
@@ -254,15 +254,15 @@ declare module "event-store-client" {
 		 * @param callback Invoked once the operation has been completed. Check the result to confirm it was successful.
 		 */
 		writeEvents(streamId: string, expectedVersion: number, requireMaster: boolean, events: Event[], credentials: ICredentials, callback: (completed: IWriteEventsCompleted) => void): void;
-		}
-		
-		export class Connection extends BaseConnection {}
-		export class TlsConnection extends BaseConnection {}
+	}
+
+	export class Connection extends BaseConnection { }
+	export class TlsConnection extends BaseConnection { }
 
     /***
 	 * Configuration settings to pass when instantiating a catch-up subscription.
 	 */
-    export class CatchUpSubscriptionSettings {
+	export class CatchUpSubscriptionSettings {
 
         /***
 		 * Creates a new settings instance.
@@ -271,33 +271,33 @@ declare module "event-store-client" {
          * @param debug True iff in debug mode
          * @param resolveLinkTos Whether or not to resolve link events
 		 */
-        constructor(maxLiveQueueSize: number, readBatchSize: number, debug: boolean, resolveLinkTos: boolean);
+		constructor(maxLiveQueueSize: number, readBatchSize: number, debug: boolean, resolveLinkTos: boolean);
 
         /***
 	     * The max amount to buffer when processing from live subscription.
 	     */
-        maxLiveQueueSize: number;
+		maxLiveQueueSize: number;
 
         /***
 	     * The number of events to read per batch when reading history
 	     */
-        readBatchSize: number;
+		readBatchSize: number;
 
         /***
 	     * True iff in debug mode
 	     */
-        debug: boolean;
+		debug: boolean;
 
         /***
 	     * Whether or not to resolve link events
 	     */
-        resolveLinkTos: boolean;
-    }
+		resolveLinkTos: boolean;
+	}
 
     /**
      * Abstract base class representing catch-up subscriptions.
      */
-    export class EventStoreCatchUpSubscription {
+	export class EventStoreCatchUpSubscription {
 
         /***
 		 * Creates a new EventStoreCatchUpSubscription instance.
@@ -309,29 +309,29 @@ declare module "event-store-client" {
          * @param subscriptionDropped Callback when subscription drops or is dropped.
          * @param settings Settings for this subscription.
 		 */
-        constructor(connection: Connection, streamId: string, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription: any, reason: string, Error: any) => void, settings: CatchUpSubscriptionSettings);
+		constructor(connection: Connection, streamId: string, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription: any, reason: string, Error: any) => void, settings: CatchUpSubscriptionSettings);
 
         /***
          * Provides the correlation ID of the Event Store subscription underlying the catch-up subscription.
          * @returns Correlation ID of the Event Store subscription
          */
-        getCorrelationId(): string;
+		getCorrelationId(): string;
 
         /***
          * Attempts to start the subscription.
          */
-        start(): void;
+		start(): void;
 
         /***
          * Attempts to stop the subscription.
          */
-        stop(): void;
-    }
+		stop(): void;
+	}
 
     /**
      * Catch-up subscription for one stream.
      */
-    export class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription {
+	export class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription {
 
         /***
 		 * Creates a new EventStoreStreamCatchUpSubscription instance.
@@ -344,6 +344,6 @@ declare module "event-store-client" {
          * @param subscriptionDropped Callback when subscription drops or is dropped.
          * @param settings Settings for this subscription.
 		 */
-        constructor(connection: Connection, streamId: string, fromEventNumberExclusive: number, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription: any, reason: string, Error: any) => void, settings: CatchUpSubscriptionSettings);
-    }
+		constructor(connection: Connection, streamId: string, fromEventNumberExclusive: number, userCredentials: ICredentials, eventAppeared: (event: StoredEvent) => void, liveProcessingStarted: () => void, subscriptionDropped: (EventStoreCatchUpSubscription: any, reason: string, Error: any) => void, settings: CatchUpSubscriptionSettings);
+	}
 }
