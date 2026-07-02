@@ -1,8 +1,16 @@
+> [!IMPORTANT]
+> I'm no longer using or developing this client, and I've marked the NPM package as deprecated.
+> 
+> This filled a gap at the time, but there are likely other options now that provide better functionality.
+
+> [!NOTE]
+> Event Store has also been rebranded as [Kurrent](https://www.kurrent.io/) and they now have their own client library [kurrent/kurrentdb-client](https://www.npmjs.com/package/@kurrent/kurrentdb-client).
+
 Event Store Client
 ==================
 Author: Carey Bishop
 
-Connects to an [Event Store](http://geteventstore.com) server over TCP/IP, to send and receive event information.
+Connects to an Event Store server over TCP/IP, to send and receive event information.
 
 The Javascript API is intended to mimic the .Net API as closely as possible.
 
